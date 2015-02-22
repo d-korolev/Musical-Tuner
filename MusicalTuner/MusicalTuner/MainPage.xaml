@@ -8,5 +8,10 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid/>
+    <Grid>
+        <ListBox x:Name="TuneList" HorizontalAlignment="Left" Height="33" Margin="47,24,0,0" VerticalAlignment="Top" Width="310">
+        <x:String>Standard Tune</x:String>
+        <x:String>Drop E Tune</x:String>
+        </ListBox>
+    </Grid>
 </Page>
