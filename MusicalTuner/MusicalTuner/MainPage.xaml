@@ -9,9 +9,19 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <ListBox x:Name="TuneList" HorizontalAlignment="Left" Height="33" Margin="47,24,0,0" VerticalAlignment="Top" Width="310">
-        <x:String>Standard Tune</x:String>
-        <x:String>Drop E Tune</x:String>
-        </ListBox>
+        <ComboBox x:Name = "GuiterTunesCombo" HorizontalAlignment="Left" Margin="45,22,0,0" VerticalAlignment="Top" Width="310" SelectionChanged="GuiterTunesCombo_SelectionChanged">
+            <ComboBoxItem Content="Standard Tune" Name="Standard" IsSelected="True"/>
+            <ComboBoxItem Content="Drop E Tune" Name="EDrop" IsSelected="True"/>
+        </ComboBox>
+        <Button x:Name="btnNote1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click"/>
+        <Button x:Name="btnNote2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,113,0,0" Width="70" Click="Button_Click"/>
+        <Button x:Name="btnNote3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="281,113,0,0" Width="70" Click="Button_Click"/>
+        <Button x:Name="btnNote4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,168,0,0" Width="70" Click="Button_Click"/>
+        <Button x:Name="btnNote5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,168,0,0" Width="70" Click="Button_Click"/>
+        <Button x:Name="btnNote6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="281,168,0,0" Width="70" Click="Button_Click"/>
+
+
+
+
     </Grid>
 </Page>
