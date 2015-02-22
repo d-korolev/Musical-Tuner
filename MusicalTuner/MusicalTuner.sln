@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsound", "libsound\libsou
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfilter", "libfilter\libfilter.vcxproj", "{B966C949-0CE0-437F-8039-7E18C3595376}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFTW", "FFTW\FFTW.vcxproj", "{BAB20C07-C973-4A18-A2AA-0D313A801F6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,24 @@ Global
 		{B966C949-0CE0-437F-8039-7E18C3595376}.Release|Win32.Build.0 = Release|Win32
 		{B966C949-0CE0-437F-8039-7E18C3595376}.Release|x86.ActiveCfg = Release|Win32
 		{B966C949-0CE0-437F-8039-7E18C3595376}.Release|x86.Build.0 = Release|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|ARM.ActiveCfg = Debug|ARM
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|ARM.Build.0 = Debug|ARM
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|Win32.Build.0 = Debug|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|x86.ActiveCfg = Debug|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Debug|x86.Build.0 = Debug|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|Any CPU.ActiveCfg = Release|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|ARM.ActiveCfg = Release|ARM
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|ARM.Build.0 = Release|ARM
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|Win32.ActiveCfg = Release|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|Win32.Build.0 = Release|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|x86.ActiveCfg = Release|Win32
+		{BAB20C07-C973-4A18-A2AA-0D313A801F6A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
