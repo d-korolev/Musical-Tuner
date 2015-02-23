@@ -27,7 +27,6 @@ namespace MusicalTuner
     public sealed partial class MainPage : Page
     {
 
-        private string value = "";
         public MainPage()
         {
             this.InitializeComponent();
@@ -51,15 +50,26 @@ namespace MusicalTuner
 
         private void GuiterTunesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            value = ((ComboBoxItem)GuiterTunesCombo)
+          
 
             if (Standard.IsSelected == true)
             {
                 btnNote1.Content = "E";
+                btnNote2.Content = "B";
+                btnNote3.Content = "G";
+                btnNote4.Content = "D";
+                btnNote5.Content = "A";
+                btnNote6.Content = "E";
+
             }
             else
             {
-                btnNote1.Content = "failed";
+                btnNote1.Content = "D";
+                btnNote2.Content = "B";
+                btnNote3.Content = "G";
+                btnNote4.Content = "D";
+                btnNote5.Content = "A";
+                btnNote6.Content = "E";
             }
             
         }
