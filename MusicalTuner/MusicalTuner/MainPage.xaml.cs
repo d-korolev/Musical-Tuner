@@ -21,8 +21,6 @@ namespace MusicalTuner
 {
     
 
-
-
     public sealed partial class MainPage : Page
     {
         private SoundIO sio;
