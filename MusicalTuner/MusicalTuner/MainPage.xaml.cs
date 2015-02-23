@@ -64,12 +64,12 @@ namespace MusicalTuner
             }
             else if (EDrop.IsSelected == true)
             {
-                btnNote1.Content = "D";
+                btnNote1.Content = "E";
                 btnNote2.Content = "B";
                 btnNote3.Content = "G";
                 btnNote4.Content = "D";
                 btnNote5.Content = "A";
-                btnNote6.Content = "E";
+                btnNote6.Content = "D";
             }
             else
             {
