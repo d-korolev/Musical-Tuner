@@ -35,7 +35,6 @@ namespace MusicalTuner
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             
-
         }
 
 
