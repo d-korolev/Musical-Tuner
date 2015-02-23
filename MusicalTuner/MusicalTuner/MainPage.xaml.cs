@@ -87,5 +87,10 @@ namespace MusicalTuner
         {
           
         }
+
+        private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
