@@ -21,8 +21,11 @@
             <ComboBoxItem Content="DADGAD Tune" x:Name="DadGad"/>
 
         </ComboBox>
-        <TextBlock Name="pitchOut" Text="Pitch" HorizontalAlignment="Left" Margin="100,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="71" SelectionChanged="TextBlock_SelectionChanged"/>
-        <TextBlock Name="octaveOut" Text="Octave" HorizontalAlignment="Left" Margin="207,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="71" SelectionChanged="TextBlock_SelectionChanged"/>
+        <TextBlock Text="Pitch" HorizontalAlignment="Left" Margin="100,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="71" SelectionChanged="TextBlock_SelectionChanged"/>
+        <TextBlock Text="Octave" HorizontalAlignment="Left" Margin="207,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="71" SelectionChanged="TextBlock_SelectionChanged"/>
+
+
+
 
     </Grid>
 </Page>
