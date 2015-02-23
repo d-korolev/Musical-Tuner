@@ -111,6 +111,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FFTW\FFTW.vcxproj">
+      <Project>{bab20c07-c973-4a18-a2aa-0d313a801f6a}</Project>
+      <Name>FFTW</Name>
+    </ProjectReference>
     <ProjectReference Include="..\libfilter\libfilter.vcxproj">
       <Project>{b966c949-0ce0-437f-8039-7e18c3595376}</Project>
       <Name>libfilter</Name>
