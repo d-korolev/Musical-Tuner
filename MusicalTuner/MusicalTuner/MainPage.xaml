@@ -9,18 +9,18 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <ComboBox x:Name = "GuiterTunesCombo" HorizontalAlignment="Left" Margin="36,26,0,0" VerticalAlignment="Top" Width="310" SelectionChanged="GuiterTunesCombo_SelectionChanged">
-            <ComboBoxItem Content="Standard Tune" Name="Standard"/>
-            <ComboBoxItem Content="Drop E Tune" Name="EDrop"/>
-            <ComboBoxItem Content="DADGAD Tune" Name="DadGad"/>
-
-        </ComboBox>
         <Button x:Name="btnNote1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click"/>
         <Button x:Name="btnNote2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,113,0,0" Width="70" Click="Button_Click"/>
         <Button x:Name="btnNote3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,113,0,0" Width="70" Click="Button_Click"/>
         <Button x:Name="btnNote4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,168,0,0" Width="70" Click="Button_Click"/>
         <Button x:Name="btnNote5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,168,0,0" Width="70" Click="Button_Click"/>
         <Button x:Name="btnNote6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,168,0,0" Width="70" Click="Button_Click"/>
+        <ComboBox x:Name = "GuiterTunesCombo" HorizontalAlignment="Left" Margin="45,22,0,0" VerticalAlignment="Top" Width="310" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="169">
+            <ComboBoxItem Content="Standard Tune" x:Name="Standard"/>
+            <ComboBoxItem Content="Drop E Tune" x:Name="EDrop"/>
+            <ComboBoxItem Content="DADGAD Tune" x:Name="DadGad"/>
+
+        </ComboBox>
 
 
 
