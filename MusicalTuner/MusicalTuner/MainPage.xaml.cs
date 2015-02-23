@@ -37,10 +37,7 @@ namespace MusicalTuner
       
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            //ComboBox comboBoxGuitar = new ComboBox();
-            //comboBoxGuitar.SelectionChanged += GuiterTunesCombo_SelectionChanged;
             
-
         }
 
         private void TuneDropList(object sender, DragEventArgs e)
