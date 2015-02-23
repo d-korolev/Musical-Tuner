@@ -62,7 +62,7 @@ namespace MusicalTuner
                 btnNote6.Content = "E";
 
             }
-            else
+            else if (EDrop.IsSelected == true)
             {
                 btnNote1.Content = "D";
                 btnNote2.Content = "B";
@@ -70,6 +70,15 @@ namespace MusicalTuner
                 btnNote4.Content = "D";
                 btnNote5.Content = "A";
                 btnNote6.Content = "E";
+            }
+            else
+            {
+                btnNote1.Content = "D";
+                btnNote2.Content = "A";
+                btnNote3.Content = "D";
+                btnNote4.Content = "G";
+                btnNote5.Content = "A";
+                btnNote6.Content = "D";
             }
             
         }

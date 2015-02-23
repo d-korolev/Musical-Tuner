@@ -12,6 +12,8 @@
         <ComboBox x:Name = "GuiterTunesCombo" HorizontalAlignment="Left" Margin="45,22,0,0" VerticalAlignment="Top" Width="310" SelectionChanged="GuiterTunesCombo_SelectionChanged">
             <ComboBoxItem Content="Standard Tune" Name="Standard"/>
             <ComboBoxItem Content="Drop E Tune" Name="EDrop"/>
+            <ComboBoxItem Content="DADGAD Tune" Name="DadGad"/>
+
         </ComboBox>
         <Button x:Name="btnNote1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click"/>
         <Button x:Name="btnNote2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,113,0,0" Width="70" Click="Button_Click"/>
