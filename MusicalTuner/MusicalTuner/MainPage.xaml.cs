@@ -52,15 +52,15 @@ namespace MusicalTuner
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             // Create sound input
-            //sio = new SoundIO();
-            //sio.start();
-            //// Create our audio tool so that we can generate the synchronization code in the appropriate format
-            //at = new AudioTool(sio.getInputNumChannels(), sio.getInputSampleRate());
+            sio = new SoundIO();
+            sio.start();
 
-            //sio.audioInEvent += (float[] data) => {
-               
-            //    process_audio(data);
-            //};
+            // Create our audio tool so that we can generate the synchronization code in the appropriate format
+            at = new AudioTool(sio.getInputNumChannels(), sio.getInputSampleRate());
+
+            sio.audioInEvent += (float[] data) => {
+                process_audio(data);
+            };
 
 
 
