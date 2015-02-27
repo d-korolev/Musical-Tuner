@@ -9,22 +9,22 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Button x:Name="btnNote1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click"/>
-        <Button x:Name="btnNote2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,113,0,0" Width="70" Click="Button_Click"/>
-        <Button x:Name="btnNote3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,113,0,0" Width="70" Click="Button_Click"/>
-        <Button x:Name="btnNote4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,168,0,0" Width="70" Click="Button_Click"/>
-        <Button x:Name="btnNote5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,168,0,0" Width="70" Click="Button_Click"/>
-        <Button x:Name="btnNote6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,168,0,0" Width="70" Click="Button_Click"/>
-        <ComboBox x:Name = "GuiterTunesCombo" HorizontalAlignment="Left" Margin="45,22,0,0" VerticalAlignment="Top" Width="310" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="159">
-            <ComboBoxItem Content="Standard Tune" x:Name="Standard"/>
-            <ComboBoxItem Content="Drop E Tune" x:Name="EDrop"/>
-            <ComboBoxItem Content="DADGAD Tune" x:Name="DadGad"/>
+        <Button Name="btnNote1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click"/>
+        <Button Name="btnNote2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,113,0,0" Width="70" Click="Button_Click"/>
+        <Button Name="btnNote3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,113,0,0" Width="70" Click="Button_Click"/>
+        <Button Name="btnNote4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,168,0,0" Width="70" Click="Button_Click"/>
+        <Button Name="btnNote5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,168,0,0" Width="70" Click="Button_Click"/>
+        <Button Name="btnNote6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,168,0,0" Width="70" Click="Button_Click"/>
+        <ComboBox Name = "GuiterTunesCombo" HorizontalAlignment="Left" Margin="45,22,0,0" VerticalAlignment="Top" Width="310" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="159">
+            <ComboBoxItem Content="Standard Tune" Name="Standard"/>
+            <ComboBoxItem Content="Drop E Tune" Name="EDrop"/>
+            <ComboBoxItem Content="DADGAD Tune" Name="DadGad"/>
 
         </ComboBox>
-        <TextBlock Name="pitchOut" Text="Pitch" HorizontalAlignment="Left" Margin="100,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="71" SelectionChanged="TextBlock_SelectionChanged"/>
-        <TextBlock Name="octaveOut" Text="Octave" HorizontalAlignment="Left" Margin="207,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="71" SelectionChanged="TextBlock_SelectionChanged"/>
+        <TextBlock Name="pitchOut" Text="Pitch" HorizontalAlignment="Left" Margin="22,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="46" Width="149" SelectionChanged="TextBlock_SelectionChanged"/>
+        <TextBlock Name="octaveOut" Text="Octave" HorizontalAlignment="Left" Margin="206,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="37" Width="128" SelectionChanged="TextBlock_SelectionChanged"/>
 
-        
+
 
 
     </Grid>
