@@ -23,6 +23,7 @@
         </ComboBox>
         <TextBlock Name="pitchOut" Text="Pitch" HorizontalAlignment="Left" Margin="22,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="46" Width="149" SelectionChanged="TextBlock_SelectionChanged"/>
         <TextBlock Name="octaveOut" Text="Octave" HorizontalAlignment="Left" Margin="206,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="37" Width="128" SelectionChanged="TextBlock_SelectionChanged"/>
+        <TextBlock Name="pitchOutAC" Text="Pitch" HorizontalAlignment="Left" Margin="10,318,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="46" Width="149" SelectionChanged="TextBlock_SelectionChanged"/>
 
 
 
