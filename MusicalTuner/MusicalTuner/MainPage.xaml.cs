@@ -25,15 +25,15 @@ namespace MusicalTuner
     public sealed partial class MainPage : Page
     {
         private SoundIO sio;
-       
+
+        // Create filter design and filter objects
+        FilterDesign fd;
+        Filter filt;
 
         private FFTWrapper fft;
 
         private bool recording = false;
         private int samples_to_wait = 0;
-        private float[] buffer = new float[10 * 480];
-        private int bufferIdx = 0;
-
         public MainPage()
         {
             this.InitializeComponent();
@@ -48,13 +48,19 @@ namespace MusicalTuner
             sio = new SoundIO();
             sio.start();
             sio.audioInEvent += sio_audioInEvent;
+
+            // Initialize FilterDesign object, create a filter impulse response, then wrap that in a Filter object
+            fd = new FilterDesign();
+            float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.2f, WindowType.HAMMING);
+            filt = new Filter(impulseResponse);
         }
 
         void sio_audioInEvent(float[] data)
         {
             recording = true;
+            data = filt.filter(data);
             detectPitchCalculation(data,100.0, 1000, 1, 1);
-            process_audio(data);
+            //process_audio(data);
         }
 
        
@@ -142,10 +148,7 @@ namespace MusicalTuner
             {
                 if (detectedPitch > 440)
                 {
-                   this.btnNote1.Background= 
-
-
-                    this.pitchOutAC.Text = "Output Frequency: " + (detectedPitch).ToString("#0.##") + " Hz";
+                    this.pitchOut.Text = "Output Frequency: " + (detectedPitch).ToString("#0.##") + " Hz";
                 }
             });
 
@@ -223,6 +226,21 @@ namespace MusicalTuner
         }
 
         private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_FFT(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_ZeroCrossing(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_Autocorrelation(object sender, RoutedEventArgs e)
         {
 
         }

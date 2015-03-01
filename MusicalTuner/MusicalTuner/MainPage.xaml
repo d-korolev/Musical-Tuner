@@ -23,7 +23,73 @@
         </ComboBox>
         <TextBlock Name="pitchOut" Text="Pitch" HorizontalAlignment="Left" Margin="22,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="46" Width="149" SelectionChanged="TextBlock_SelectionChanged"/>
         <TextBlock Name="octaveOut" Text="Octave" HorizontalAlignment="Left" Margin="206,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="37" Width="128" SelectionChanged="TextBlock_SelectionChanged"/>
-        <TextBlock Name="pitchOutAC" Text="Pitch" HorizontalAlignment="Left" Margin="10,318,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="46" Width="149" SelectionChanged="TextBlock_SelectionChanged"/>
+        <Rectangle Name="centerFrequency" HorizontalAlignment="Left" Height="133" Margin="173,358,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <Button x:Name="btnFFT" Content="FFT" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,556,0,0" FontSize="14" Click="Button_Click_FFT" Background="red"/>
+        <Button x:Name="btnZero" Content="ZeroCrossing" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,556,0,0" FontSize="14" Click="Button_Click_Autocorrelation" Background="red"/>
+        <Button x:Name="btnAuto" Content="Autocorrelation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="130,556,0,0" FontSize="14" Click="Button_Click_ZeroCrossing" Background="red"/>
+        <TextBlock HorizontalAlignment="Left" Margin="45,105,0,0" TextWrapping="Wrap" Text="String 1" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="173,105,0,0" TextWrapping="Wrap" Text="String 2" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="303,105,0,0" TextWrapping="Wrap" Text="String 3" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="45,167,0,0" TextWrapping="Wrap" Text="String 4" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="173,167,0,0" TextWrapping="Wrap" Text="String 5" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="303,167,0,0" TextWrapping="Wrap" Text="String 6" VerticalAlignment="Top"/>
+        <Rectangle Name="plusTen" HorizontalAlignment="Left" Height="108" Margin="217,383,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="minusTen" HorizontalAlignment="Left" Height="108" Margin="130,383,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="plusTwenty" HorizontalAlignment="Left" Height="88" Margin="265,403,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="minusTwenty" HorizontalAlignment="Left" Height="88" Margin="82,403,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="plusThirty" HorizontalAlignment="Left" Height="46" Margin="307,445,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="minusThity" HorizontalAlignment="Left" Height="46" Margin="40,445,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
 
 
 
