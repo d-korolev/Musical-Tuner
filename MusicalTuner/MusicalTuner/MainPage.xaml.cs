@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Navigation;
 using libsound;
 using libfilter;
 using FFTW;
+using Windows.UI.Core;
 
 
 namespace MusicalTuner
@@ -52,7 +53,7 @@ namespace MusicalTuner
         void sio_audioInEvent(float[] data)
         {
             recording = true;
-            detectPitchCalculation(data,100.0, 500.0, 1, 1);
+            detectPitchCalculation(data,100.0, 1000, 1, 1);
             process_audio(data);
         }
 
@@ -80,8 +81,12 @@ namespace MusicalTuner
             float detectedFrequency = maxIndex * (sampleRate / N);
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                this.pitchOut.Text = "Output Frequency: " + (detectedFrequency ).ToString("#0.##") + " Hz";
-                this.octaveOut.Text = "Mag: " + maxValue;
+                if (detectedFrequency>440)
+                {
+                    this.pitchOut.Text = "Output Frequency: " + (detectedFrequency).ToString("#0.##") + " Hz";
+                    this.octaveOut.Text = "Mag: " + maxValue;
+                }
+
             });
 
         }
@@ -135,7 +140,13 @@ namespace MusicalTuner
             float detectedPitch = res[0];
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                this.pitchOutAC.Text = "Output Frequency: " + (detectedPitch).ToString("#0.##") + " Hz";
+                if (detectedPitch > 440)
+                {
+                   this.btnNote1.Background= 
+
+
+                    this.pitchOutAC.Text = "Output Frequency: " + (detectedPitch).ToString("#0.##") + " Hz";
+                }
             });
 
         }
