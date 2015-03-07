@@ -16,6 +16,8 @@ using libsound;
 using libfilter;
 using FFTW;
 using Windows.UI.Core;
+using Windows.UI;
+
 
 
 namespace MusicalTuner
@@ -59,7 +61,7 @@ namespace MusicalTuner
         {
             recording = true;
             data = filt.filter(data);
-            detectPitchCalculation(data,100.0, 1000, 1, 1);
+            detectPitchCalculation(data,100, 1000, 1, 1);
             //process_audio(data);
         }
 
@@ -120,7 +122,7 @@ namespace MusicalTuner
             int nLowPeriodInSamples = hzToPeriodInSamples(maxHz, sampleRate);
             int nHiPeriodInSamples = hzToPeriodInSamples(minHz, sampleRate);
             if (nHiPeriodInSamples <= nLowPeriodInSamples) throw new Exception("Bad range for pitch detection.");
-            if (numOfChannel != 1) throw new Exception("Only mono supported.");
+            //if (numOfChannel != 1) throw new Exception("Only mono supported.");
             float[] samples = input;
             if (samples.Length < nHiPeriodInSamples) throw new Exception("Not enough samples.");
 
@@ -149,10 +151,55 @@ namespace MusicalTuner
                 if (detectedPitch > 440)
                 {
                     this.pitchOut.Text = "Output Frequency: " + (detectedPitch).ToString("#0.##") + " Hz";
+                    changeColor(1);    
                 }
             });
 
         }
+
+        /// <summary>
+        /// Changes the color of the rectangle
+        /// </summary>
+        public void changeColor(int color)
+        {
+            if (color == 1)
+            {
+                // Create a LinearGradientBrush and use it to 
+                // paint the rectangle.
+
+                LinearGradientBrush gradient = new LinearGradientBrush();
+                gradient.StartPoint = new Point(0, 0);
+                gradient.EndPoint = new Point(1, 1);
+
+                GradientStop color1 = new GradientStop();
+                color1.Color = Colors.Yellow;
+                color1.Offset = 0.2;
+                gradient.GradientStops.Add(color1);
+
+                GradientStop color2 = new GradientStop();
+                color2.Color = Colors.Orange;
+                color2.Offset = 0.5;
+                gradient.GradientStops.Add(color2);
+
+                GradientStop color3 = new GradientStop();
+                color3.Color = Colors.Red;
+                color3.Offset = 0.8;
+                gradient.GradientStops.Add(color3);
+
+
+                minusTen.Fill = gradient;
+            }
+            else if (color == 2)
+            {
+                // Create a blue Brush
+                Brush brush = new SolidColorBrush(Colors.Blue);
+                // Fill rectangle with blue color
+                minusTen.Fill = brush;
+            }
+
+
+        }
+
         private static int[] findBestCandidates(int n, ref double[] inputs)
         {
             if (inputs.Length < n) throw new Exception("Length of inputs is not long enough.");
