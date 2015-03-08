@@ -36,6 +36,8 @@ namespace MusicalTuner
 
         private bool recording = false;
         private int samples_to_wait = 0;
+
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -53,7 +55,7 @@ namespace MusicalTuner
 
             // Initialize FilterDesign object, create a filter impulse response, then wrap that in a Filter object
             fd = new FilterDesign();
-            float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.2f, WindowType.HAMMING);
+            float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.HAMMING);
             filt = new Filter(impulseResponse);
         }
 
@@ -61,11 +63,10 @@ namespace MusicalTuner
         {
             recording = true;
             data = filt.filter(data);
-            detectPitchCalculation(data,100, 1000, 1, 1);
+            detectPitchCalculation(data,100, 600, 1, 1);
             //process_audio(data);
         }
 
-       
         // Here we start recording, so we wait for 4800 more samples to pass, then check FFTs
         private void start_recording(int idx)
         {
@@ -148,7 +149,7 @@ namespace MusicalTuner
             float detectedPitch = res[0];
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch > 440)
+                if (detectedPitch > 0)
                 {
                     this.pitchOut.Text = "Output Frequency: " + (detectedPitch).ToString("#0.##") + " Hz";
                     changeColor(1);    
