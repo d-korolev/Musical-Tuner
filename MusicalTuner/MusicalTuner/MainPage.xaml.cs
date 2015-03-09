@@ -117,7 +117,7 @@ namespace MusicalTuner
             float detectedFrequency = maxIndex * (sampleRate / N);
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                this.pitchOut.Text = "Pitch: " + (detectedFrequency).ToString("#0") + " Hz";
+                this.pitchOut.Text = detectedFrequency.ToString();
                
             });
 
@@ -187,7 +187,7 @@ namespace MusicalTuner
            
               Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
               {
-                  this.pitchOut.Text = "Pitch: " + (zeroCrossFrequency).ToString("#0") + " Hz";
+                  this.pitchOut.Text = zeroCrossFrequency.ToString();
 
               });
 
@@ -235,7 +235,7 @@ namespace MusicalTuner
             {
                 if (detectedPitch > 0)
                 {
-                    this.pitchOut.Text = "Pitch: " + (detectedPitch).ToString("#0.##") + " Hz";
+                    this.pitchOut.Text = detectedPitch.ToString();
                     //changeColor(1);    
                 }
             });
@@ -383,6 +383,15 @@ namespace MusicalTuner
             {
                 btnString1.Background = new SolidColorBrush(Colors.Green);
                 youPressedMe = true;
+                if (btnString1.Content.Equals("E"))
+                {
+                    pitchOutTarget.Text = "329.6";  
+                }
+                else
+                {
+                    pitchOutTarget.Text = "311.1";
+                }
+               
             }
             else
             {
@@ -397,6 +406,15 @@ namespace MusicalTuner
             {
                 btnString2.Background = new SolidColorBrush(Colors.Green);
                 youPressedMe = true;
+                if (btnString2.Content.Equals("B"))
+                {
+                    pitchOutTarget.Text = "246.9";
+                }
+                else
+                {
+                    pitchOutTarget.Text = "220.0";
+                }
+               
             }
             else
             {
@@ -412,6 +430,11 @@ namespace MusicalTuner
             {
                 btnString3.Background = new SolidColorBrush(Colors.Green);
                 youPressedMe = true;
+                if (btnString3.Content.Equals("G"))
+                {
+                    pitchOutTarget.Text = "196.0";
+                }
+               
             }
             else
             {
@@ -426,6 +449,11 @@ namespace MusicalTuner
             {
                 btnString4.Background = new SolidColorBrush(Colors.Green);
                 youPressedMe = true;
+                if (btnString4.Content.Equals("D"))
+                {
+                    pitchOutTarget.Text = "146.8";
+                }
+               
             }
             else
             {
@@ -440,6 +468,11 @@ namespace MusicalTuner
             {
                 btnString5.Background = new SolidColorBrush(Colors.Green);
                 youPressedMe = true;
+                if (btnString5.Content.Equals("A"))
+                {
+                    pitchOutTarget.Text = "110.0";
+                }
+                
             }
             else
             {
@@ -455,6 +488,14 @@ namespace MusicalTuner
             {
                 btnString6.Background = new SolidColorBrush(Colors.Green);
                 youPressedMe = true;
+                if (btnString6.Content.Equals("E"))
+                {
+                    pitchOutTarget.Text = "82.4";
+                }
+                else
+                {
+                    pitchOutTarget.Text = "73.4";
+                }
             }
             else
             {
