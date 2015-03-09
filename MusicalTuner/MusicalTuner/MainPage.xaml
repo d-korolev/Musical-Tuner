@@ -9,12 +9,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Button Name="btnNote1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click" Background="red"/>
-        <Button Name="btnNote2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,113,0,0" Width="70" Click="Button_Click" Background="red"/>
-        <Button Name="btnNote3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,113,0,0" Width="70" Click="Button_Click" Background="red"/>
-        <Button Name="btnNote4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,177,0,0" Width="70" Click="Button_Click" Background="red"/>
-        <Button Name="btnNote5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,177,0,0" Width="70" Click="Button_Click" Background="red"/>
-        <Button Name="btnNote6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,177,0,0" Width="70" Click="Button_Click" Background="red"/>
+        <Button Name="btnString1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click_String1" Background="red"/>
+        <Button Name="btnString2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,113,0,0" Width="70" Click="Button_Click_String2" Background="red"/>
+        <Button Name="btnString3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,113,0,0" Width="70" Click="Button_Click_String3" Background="red"/>
+        <Button Name="btnString4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,177,0,0" Width="70" Click="Button_Click_String4" Background="red"/>
+        <Button Name="btnString5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,177,0,0" Width="70" Click="Button_Click_String5" Background="red"/>
+        <Button Name="btnString6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,177,0,0" Width="70" Click="Button_Click_String6" Background="red"/>
         <ComboBox Name = "GuiterTunesCombo"   HorizontalAlignment="Center" Margin="47,22,48,0" VerticalAlignment="Top" Width="289" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="159" Foreground="White" BorderBrush="White" Background="#FF0F0000">
             <ComboBoxItem Content="Standard Tune" Name="Standard" HorizontalAlignment="Center"/>
             <ComboBoxItem Content="Drop E Tune" Name="EDrop" HorizontalAlignment="Center"/>

@@ -35,7 +35,7 @@ namespace MusicalTuner
         private bool recordingZero = false;
         private bool recordingAuto = false;
        
-        private float[] buffer = new float[960];
+        private float[] buffer = new float[1920];
         private int bufferIdx = 0;
         private bool youPressedMe = false;
         
@@ -275,12 +275,6 @@ namespace MusicalTuner
             return 1 / (period / sampleRate);
         }
 
-
-
-
-
-
-
        
 
         private void GuiterTunesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -289,50 +283,36 @@ namespace MusicalTuner
 
             if (Standard.IsSelected == true)
             {
-                btnNote1.Content = "E";
-                btnNote2.Content = "B";
-                btnNote3.Content = "G";
-                btnNote4.Content = "D";
-                btnNote5.Content = "A";
-                btnNote6.Content = "E";
+                btnString1.Content = "E";
+                btnString2.Content = "B";
+                btnString3.Content = "G";
+                btnString4.Content = "D";
+                btnString5.Content = "A";
+                btnString6.Content = "E";
 
             }
             else if (EDrop.IsSelected == true)
             {
-                btnNote1.Content = "E";
-                btnNote2.Content = "B";
-                btnNote3.Content = "G";
-                btnNote4.Content = "D";
-                btnNote5.Content = "A";
-                btnNote6.Content = "D";
+                btnString1.Content = "E";
+                btnString2.Content = "B";
+                btnString3.Content = "G";
+                btnString4.Content = "D";
+                btnString5.Content = "A";
+                btnString6.Content = "D";
             }
             else
             {
-                btnNote1.Content = "D";
-                btnNote2.Content = "A";
-                btnNote3.Content = "D";
-                btnNote4.Content = "G";
-                btnNote5.Content = "A";
-                btnNote6.Content = "D";
+                btnString1.Content = "D";
+                btnString2.Content = "A";
+                btnString3.Content = "D";
+                btnString4.Content = "G";
+                btnString5.Content = "A";
+                btnString6.Content = "D";
             }
             
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (!youPressedMe)
-            {
-                btnFFT.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
-            }
-            else
-            {
-                btnFFT.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
-            }
-            sio.start();
-            sio.audioInEvent += sio_audioInEvent_FFT;
-        }
+        
 
         private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
         {
@@ -396,5 +376,98 @@ namespace MusicalTuner
             //sio.start();
             //sio.audioInEvent += sio_audioInEvent_AutoCorrelation;
         }
+
+        private void Button_Click_String1(object sender, RoutedEventArgs e)
+        {
+            if (!youPressedMe)
+            {
+                btnString1.Background = new SolidColorBrush(Colors.Green);
+                youPressedMe = true;
+            }
+            else
+            {
+                btnString1.Background = new SolidColorBrush(Colors.Red);
+                youPressedMe = false;
+            }
+        }
+
+        private void Button_Click_String2(object sender, RoutedEventArgs e)
+        {
+            if (!youPressedMe)
+            {
+                btnString2.Background = new SolidColorBrush(Colors.Green);
+                youPressedMe = true;
+            }
+            else
+            {
+                btnString2.Background = new SolidColorBrush(Colors.Red);
+                youPressedMe = false;
+            }
+        }
+
+
+        private void Button_Click_String3(object sender, RoutedEventArgs e)
+        {
+            if (!youPressedMe)
+            {
+                btnString3.Background = new SolidColorBrush(Colors.Green);
+                youPressedMe = true;
+            }
+            else
+            {
+                btnString3.Background = new SolidColorBrush(Colors.Red);
+                youPressedMe = false;
+            }
+        }
+
+        private void Button_Click_String4(object sender, RoutedEventArgs e)
+        {
+            if (!youPressedMe)
+            {
+                btnString4.Background = new SolidColorBrush(Colors.Green);
+                youPressedMe = true;
+            }
+            else
+            {
+                btnString4.Background = new SolidColorBrush(Colors.Red);
+                youPressedMe = false;
+            }
+        }
+
+        private void Button_Click_String5(object sender, RoutedEventArgs e)
+        {
+            if (!youPressedMe)
+            {
+                btnString5.Background = new SolidColorBrush(Colors.Green);
+                youPressedMe = true;
+            }
+            else
+            {
+                btnString5.Background = new SolidColorBrush(Colors.Red);
+                youPressedMe = false;
+            }
+        }
+
+
+        private void Button_Click_String6(object sender, RoutedEventArgs e)
+        {
+            if (!youPressedMe)
+            {
+                btnString6.Background = new SolidColorBrush(Colors.Green);
+                youPressedMe = true;
+            }
+            else
+            {
+                btnString6.Background = new SolidColorBrush(Colors.Red);
+                youPressedMe = false;
+            }
+        }
+
+
+
+
+
+
+
     }
 }
