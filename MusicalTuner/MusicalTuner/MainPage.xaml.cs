@@ -51,6 +51,8 @@ namespace MusicalTuner
         private bool firstPointIs = false;
         private bool lastPointIs = false;
         private int ignoreSample = 0;
+        private float total;
+        private float totalF;
 
      //   private float[] bufferZeroCrossing = new float[4800];
 
@@ -182,6 +184,15 @@ namespace MusicalTuner
                       
                   }
                   
+                  
+                      //total += zeroCrossFrequency;
+                      //if (j == 1919)
+                      //{
+                      //   totalF = total / j;
+                      //   total = 0;
+                      //}
+                
+                  
               }
 
            
@@ -304,8 +315,8 @@ namespace MusicalTuner
             {
                 btnString1.Content = "D";
                 btnString2.Content = "A";
-                btnString3.Content = "D";
-                btnString4.Content = "G";
+                btnString3.Content = "G";
+                btnString4.Content = "D";
                 btnString5.Content = "A";
                 btnString6.Content = "D";
             }
@@ -431,6 +442,10 @@ namespace MusicalTuner
                 btnString3.Background = new SolidColorBrush(Colors.Green);
                 youPressedMe = true;
                 if (btnString3.Content.Equals("G"))
+                {
+                    pitchOutTarget.Text = "196.0";
+                }
+                else
                 {
                     pitchOutTarget.Text = "196.0";
                 }
