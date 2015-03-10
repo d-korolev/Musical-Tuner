@@ -9,79 +9,30 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Button Name="btnNote1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click"/>
-        <Button Name="btnNote2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,113,0,0" Width="70" Click="Button_Click"/>
-        <Button Name="btnNote3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,113,0,0" Width="70" Click="Button_Click"/>
-        <Button Name="btnNote4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,168,0,0" Width="70" Click="Button_Click"/>
-        <Button Name="btnNote5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,168,0,0" Width="70" Click="Button_Click"/>
-        <Button Name="btnNote6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,168,0,0" Width="70" Click="Button_Click"/>
-        <ComboBox Name = "GuiterTunesCombo" HorizontalAlignment="Left" Margin="45,22,0,0" VerticalAlignment="Top" Width="310" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="159">
-            <ComboBoxItem Content="Standard Tune" Name="Standard"/>
-            <ComboBoxItem Content="Drop E Tune" Name="EDrop"/>
-            <ComboBoxItem Content="DADGAD Tune" Name="DadGad"/>
+        <Button Name="btnString1" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,113,0,0" Width="70" Click="Button_Click_String1" Background="red"/>
+        <Button Name="btnString2" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,113,0,0" Width="70" Click="Button_Click_String2" Background="red"/>
+        <Button Name="btnString3" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,113,0,0" Width="70" Click="Button_Click_String3" Background="red"/>
+        <Button Name="btnString4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,177,0,0" Width="70" Click="Button_Click_String4" Background="red"/>
+        <Button Name="btnString5" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="136,177,0,0" Width="70" Click="Button_Click_String5" Background="red"/>
+        <Button Name="btnString6" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,177,0,0" Width="70" Click="Button_Click_String6" Background="red"/>
+        <ComboBox Name = "GuiterTunesCombo"   HorizontalAlignment="Center" Margin="47,22,48,0" VerticalAlignment="Top" Width="289" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="159" Foreground="White" BorderBrush="White" Background="#FF0F0000">
+            <ComboBoxItem Content="Standard Tune" Name="Standard" HorizontalAlignment="Center"/>
+            <ComboBoxItem Content="Drop E Tune" Name="EDrop" HorizontalAlignment="Center"/>
+            <ComboBoxItem Content="DADGAD Tune" Name="DadGad" HorizontalAlignment="Center"/>
 
         </ComboBox>
-        <TextBlock Name="pitchOut" Text="Pitch" HorizontalAlignment="Left" Margin="22,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="46" Width="149" SelectionChanged="TextBlock_SelectionChanged"/>
-        <TextBlock Name="octaveOut" Text="Octave" HorizontalAlignment="Left" Margin="206,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="37" Width="128" SelectionChanged="TextBlock_SelectionChanged"/>
-        <Rectangle Name="centerFrequency" HorizontalAlignment="Left" Height="133" Margin="173,358,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0"/>
-                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
-        </Rectangle>
-
+        <TextBlock Name="pitchOut" Text="000.0" HorizontalAlignment="Left" Margin="185,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="56" SelectionChanged="TextBlock_SelectionChanged" FontSize="20"/>
         <Button x:Name="btnFFT" Content="FFT" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,556,0,0" FontSize="14" Click="Button_Click_FFT" Background="red"/>
-        <Button x:Name="btnZero" Content="ZeroCrossing" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="265,556,0,0" FontSize="14" Click="Button_Click_Autocorrelation" Background="red"/>
-        <Button x:Name="btnAuto" Content="Autocorrelation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="130,556,0,0" FontSize="14" Click="Button_Click_ZeroCrossing" Background="red"/>
+        <Button x:Name="btnAuto" Content="Autocorrelation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="248,556,0,0" FontSize="14" Click="Button_Click_Autocorrelation" Background="red"/>
+        <Button x:Name="btnZero" Content="Zero Crossing" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,556,0,0" FontSize="14" Click="Button_Click_ZeroCrossing" Background="red"/>
         <TextBlock HorizontalAlignment="Left" Margin="45,105,0,0" TextWrapping="Wrap" Text="String 1" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="173,105,0,0" TextWrapping="Wrap" Text="String 2" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="303,105,0,0" TextWrapping="Wrap" Text="String 3" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="45,167,0,0" TextWrapping="Wrap" Text="String 4" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="173,167,0,0" TextWrapping="Wrap" Text="String 5" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="303,167,0,0" TextWrapping="Wrap" Text="String 6" VerticalAlignment="Top"/>
-        <Rectangle Name="plusTen" HorizontalAlignment="Left" Height="108" Margin="217,383,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0"/>
-                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="minusTen" HorizontalAlignment="Left" Height="108" Margin="130,383,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0"/>
-                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="plusTwenty" HorizontalAlignment="Left" Height="88" Margin="265,403,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0"/>
-                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="minusTwenty" HorizontalAlignment="Left" Height="88" Margin="82,403,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0"/>
-                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="plusThirty" HorizontalAlignment="Left" Height="46" Margin="307,445,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black" Offset="0"/>
-                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
-        </Rectangle>
-        <Rectangle Name="minusThity" HorizontalAlignment="Left" Height="46" Margin="40,445,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+
+        <Rectangle Name="centerFrequency" HorizontalAlignment="Left" Height="177" Margin="173,314,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
             <Rectangle.Fill>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="0"/>
@@ -90,7 +41,60 @@
             </Rectangle.Fill>
         </Rectangle>
 
-
+        <Rectangle Name="plusTen" HorizontalAlignment="Left" Height="120" Margin="215,371,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="minusTen" HorizontalAlignment="Left" Height="120
+                   " Margin="131,371,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="plusTwenty" HorizontalAlignment="Left" Height="88" Margin="257,403,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="minusTwenty" HorizontalAlignment="Left" Height="88" Margin="89,403,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="plusThirty" HorizontalAlignment="Left" Height="46" Margin="299,445,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Name="minusThirty" HorizontalAlignment="Left" Height="46" Margin="47,445,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#FFDAD1D1" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <TextBlock x:Name="pitchOutTarget" Text="000.0" HorizontalAlignment="Left" Margin="185,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="52" SelectionChanged="TextBlock_SelectionChanged" FontSize="20"/>
+        <TextBlock HorizontalAlignment="Left" Margin="125,237,0,0" TextWrapping="Wrap" Text="Pitch:" VerticalAlignment="Top" Height="20" Width="46" FontSize="18"/>
+        <TextBlock HorizontalAlignment="Left" Margin="115,269,0,0" TextWrapping="Wrap" Text="Target:" VerticalAlignment="Top" Height="20" Width="56" FontSize="18"/>
+        <TextBlock HorizontalAlignment="Left" Margin="246,237,0,0" TextWrapping="Wrap" Text="Hz" VerticalAlignment="Top" Height="20" Width="21" FontSize="18"/>
+        <TextBlock HorizontalAlignment="Left" Margin="246,269,0,0" TextWrapping="Wrap" Text="Hz" VerticalAlignment="Top" Height="20" Width="21" FontSize="18"/>
 
 
 
