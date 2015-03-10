@@ -35,15 +35,19 @@ namespace MusicalTuner
         private bool recordingZero = false;
         private bool recordingAuto = false;
        
-        private float[] buffer = new float[1920];
+        private float[] bufferAuto = new float[1920];
+        private float[] bufferZero = new float[1920];
+        private float[] bufferFFT = new float[1920];
         private int bufferIdx = 0;
+        private int bufferIdxFFT = 0;
         private bool youPressedMe = false;
         
         // Zero Crossing related variables
 
         private int zeroCrossingCounter;
         private bool zeroCrossed = false;
-        private float zeroCrossFrequency;
+        private float zeroCrossFrequencyZero;
+        private float zeroCrossFrequencyFFT;
         private float zeroCrossTime;
         private int sampleCounterBtwZeroCrossings;
         private float zeroCrossPeriod;
@@ -51,11 +55,8 @@ namespace MusicalTuner
         private bool firstPointIs = false;
         private bool lastPointIs = false;
         private int ignoreSample = 0;
-        private float total;
-        private float totalF;
-
-     //   private float[] bufferZeroCrossing = new float[4800];
-
+        //private float total;
+        //private float totalF;
 
 
         public MainPage()
@@ -108,18 +109,36 @@ namespace MusicalTuner
             if (!recordingFFT)
                 return;
 
-            uint N = Convert.ToUInt32(data.Length);
+         
             float sampleRate = sio.getInputSampleRate();
-            
+
+            //Filling in new 1920 samples buffer
+            int i = 0;
+            ignoreSample = 1;
+            while (bufferIdxFFT < bufferFFT.Length)
+            {
+                bufferFFT[bufferIdxFFT] = data[i + ignoreSample];
+                bufferIdxFFT++;
+                i++;
+                if (i + ignoreSample >= data.Length)
+                {
+                    ignoreSample = 0;
+                    return;
+                }
+
+            }
+            uint N = Convert.ToUInt32(bufferFFT.Length);
             fft = new FFTWrapper(N);
-            float[] fftmag = fft.fftMag(data);
+            float[] fftmag = fft.fftMag(bufferFFT);
             // Detect and display dominant freq.
             float maxValue = fftmag.Max();
             float maxIndex = fftmag.ToList().IndexOf(maxValue);
-            float detectedFrequency = maxIndex * (sampleRate / N);
+            float detectedFrequencyFFT = maxIndex * (sampleRate / N);
+            bufferIdxFFT= 0;
+            recordingFFT = false;
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                this.pitchOut.Text = detectedFrequency.ToString();
+                this.pitchOut.Text = detectedFrequencyFFT.ToString();
                
             });
 
@@ -134,27 +153,28 @@ namespace MusicalTuner
               
               float sampleRate = sio.getInputSampleRate();
 
-            //Filling in new 960 samples buffer
+            //Filling in new 1920 samples buffer
               int i = 0;
               ignoreSample = 1;
-            while (bufferIdx < buffer.Length)
+            while (bufferIdx < bufferZero.Length)
             {
-                buffer[bufferIdx] = data[i + ignoreSample];
+                bufferZero[bufferIdx] = data[i + ignoreSample];
                 bufferIdx++;
                 i++;
                 if (i + ignoreSample >= data.Length)
                 {
-                    //ignoreSample = 0;
+                   // ignoreSample = 0;
                     return;
                 }
               
             }
 
-              uint N = Convert.ToUInt32(buffer.Length);
+              uint N = Convert.ToUInt32(bufferZero.Length);
               bufferIdx = 0;
+              recordingZero = false;
               for (int j = 1; j < N; j++)
               {
-                  if (buffer[j] * buffer[j-1] < 0)
+                  if (bufferZero[j] * bufferZero[j-1] < 0)
                   {
                       zeroCrossed = true;
                       zeroCrossingCounter ++;
@@ -179,7 +199,8 @@ namespace MusicalTuner
                       firstPointIs = false;
                       if (sampleCounterBtwZeroCrossings > 0)
                       {
-                          zeroCrossFrequency = 1 / ((sampleCounterBtwZeroCrossings * (N/sampleRate)) / N); 
+                          //zeroCrossFrequencyZero = 1 / ((sampleCounterBtwZeroCrossings * (N/sampleRate)) / N); 
+                          zeroCrossFrequencyZero = sampleRate/sampleCounterBtwZeroCrossings;
                       }
                       
                   }
@@ -198,7 +219,7 @@ namespace MusicalTuner
            
               Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
               {
-                  this.pitchOut.Text = zeroCrossFrequency.ToString();
+                  this.pitchOut.Text = zeroCrossFrequencyZero.ToString();
 
               });
 
