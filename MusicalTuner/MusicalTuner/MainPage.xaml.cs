@@ -35,13 +35,17 @@ namespace MusicalTuner
         private bool recordingFFT = false;
         private bool recordingZero = false;
         private bool recordingAuto = false;
+        private string recordingMode;
 
         private float[] bufferAuto = new float[bufferSize];
         private float[] bufferZero = new float[bufferSize];
         private float[] bufferFFT = new float[bufferSize];
         private int bufferIdx = 0;
         private int bufferIdxFFT = 0;
-        private bool youPressedMe = false;
+        private bool youPressedString = false;
+        private bool youPressedProcess = false;
+
+        private int selectedString;
 
         // Zero Crossing related variables
 
@@ -73,7 +77,6 @@ namespace MusicalTuner
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
 
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             // Create sound input
@@ -83,8 +86,17 @@ namespace MusicalTuner
             fd = new FilterDesign();
             float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.HAMMING);
             filt = new Filter(impulseResponse);
-            //sio.start();
-            //sio.audioInEvent += sio_audioInEvent;
+            buttonInitialization(false);
+        }
+
+        private void buttonInitialization(bool stats)
+        {
+            btnString1.IsEnabled = stats;
+            btnString2.IsEnabled = stats;
+            btnString3.IsEnabled = stats;
+            btnString4.IsEnabled = stats;
+            btnString5.IsEnabled = stats;
+            btnString6.IsEnabled = stats;
         }
 
         void sio_audioInEvent_FFT(float[] data)
@@ -102,9 +114,7 @@ namespace MusicalTuner
 
         void sio_audioInEvent_Auto(float[] data)
         {
-
             recordingAuto = true;
-            
             float[] filteredData = filt.filter(data);
             Array.Copy(filteredData, 0, this.buffer, this.bufferPosition, data.Length);
             bufferPosition = (bufferPosition + data.Length) % this.buffer.Length;
@@ -113,9 +123,6 @@ namespace MusicalTuner
                 process_audio_Auto(this.buffer, 50, 1000, 3, 1);
             }
         }
-
-
-
 
         private void process_audio_FFT(float[] data)
         {
@@ -151,12 +158,11 @@ namespace MusicalTuner
             recordingFFT = false;
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                this.pitchOut.Text = detectedFrequencyFFT.ToString();
+                this.pitchOut.Text = detectedFrequencyFFT.ToString("#0.##");
 
             });
 
         }
-
 
         private void process_audio_Zero(float[] data)
         {
@@ -232,7 +238,7 @@ namespace MusicalTuner
 
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                this.pitchOut.Text = zeroCrossFrequencyZero.ToString();
+                this.pitchOut.Text = zeroCrossFrequencyZero.ToString("#0.##");
 
             });
 
@@ -266,18 +272,58 @@ namespace MusicalTuner
             float[] res = new float[nCandidates];
             for (int i = 0; i < nCandidates; i++)
                 res[i] = periodInSamplesToHz(bestIndices[i] + nLowPeriodInSamples, sampleRate);
-            float detectedPitch = res[0];
+            float detectedPitch = res[0] + 0.5f;
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch > lowFreq && detectedPitch < highFreq)
+                if (detectedPitch > 0)// lowFreq && detectedPitch < highFreq)
                 {
-                    this.pitchOut.Text = "Output Frequency: " + (detectedPitch).ToString("#0.##") + " Hz";
+                    this.pitchOut.Text = (detectedPitch).ToString("#0.##");
                     float pitchGage = Math.Abs(detectedPitch - this.targetFrequency);
                     changeColor(pitchGage);
                 }
             });
 
         }
+        
+        private static int[] findBestCandidates(int n, ref double[] inputs)
+        {
+            if (inputs.Length < n) throw new Exception("Length of inputs is not long enough.");
+            int[] res = new int[n]; // will hold indices with the highest amounts.
+            double[] values = new double[n];
+
+            for (int c = 0; c < n; c++)
+            {
+                // find the highest.
+                double fBestValue = double.MinValue;
+                int nBestIndex = -1;
+                for (int i = 0; i < inputs.Length; i++)
+                    if (inputs[i] > fBestValue) { nBestIndex = i; fBestValue = inputs[i]; }
+
+                // record this highest value
+                res[c] = nBestIndex;
+                values[c] = inputs[nBestIndex];
+
+
+                // now blank out that index.
+                inputs[nBestIndex] = double.MinValue;
+
+            }
+            double C = values[0];
+            double A = ((values[2] + values[1]) / values[0]) / 2;
+            double B = values[1] - A - C;
+            return res;
+        }
+        
+        private static int hzToPeriodInSamples(double hz, float sampleRate)
+        {
+            return (int)(1 / (hz / (double)sampleRate));
+        }
+        
+        private static float periodInSamplesToHz(int period, float sampleRate)
+        {
+            return 1 / (period / sampleRate);
+        }
+        
         public void changeColor(float pitchDelta)
         {
             // Create a LinearGradientBrush and use it to 
@@ -285,7 +331,7 @@ namespace MusicalTuner
             LinearGradientBrush gradient = new LinearGradientBrush();
             gradient.StartPoint = new Point(0.5, 0);
             gradient.EndPoint = new Point(0.5, 1);
-            if (pitchDelta >= 0 && pitchDelta <= 1)
+            if (pitchDelta >= 0 && pitchDelta <= 2)
             {
                 GradientStop color1 = new GradientStop();
                 color1.Color = Colors.Black;
@@ -303,7 +349,7 @@ namespace MusicalTuner
                 plusThirty.Fill = gradient;
                 minusThirty.Fill = gradient;
             }
-            else if (pitchDelta > 1 && pitchDelta <= 5)
+            else if (pitchDelta > 2 && pitchDelta <= 5)
             {
                 //// Create a LinearGradientBrush and use it to 
                 //// paint the Bars
@@ -355,50 +401,10 @@ namespace MusicalTuner
 
             }
         }
-
-        private static int[] findBestCandidates(int n, ref double[] inputs)
-        {
-            if (inputs.Length < n) throw new Exception("Length of inputs is not long enough.");
-            int[] res = new int[n]; // will hold indices with the highest amounts.
-            double[] values = new double[n];
-
-            for (int c = 0; c < n; c++)
-            {
-                // find the highest.
-                double fBestValue = double.MinValue;
-                int nBestIndex = -1;
-                for (int i = 0; i < inputs.Length; i++)
-                    if (inputs[i] > fBestValue) { nBestIndex = i; fBestValue = inputs[i]; }
-
-                // record this highest value
-                res[c] = nBestIndex;
-                values[c] = inputs[nBestIndex];
-
-
-                // now blank out that index.
-                inputs[nBestIndex] = double.MinValue;
-
-            }
-            double C = values[0];
-            double A = ((values[2] + values[1]) / values[0]) / 2;
-            double B = values[1] - A - C;
-            return res;
-        }
-
-
-        private static int hzToPeriodInSamples(double hz, float sampleRate)
-        {
-            return (int)(1 / (hz / (double)sampleRate));
-        }
-        private static float periodInSamplesToHz(int period, float sampleRate)
-        {
-            return 1 / (period / sampleRate);
-        }
-
-
+       
         private void GuiterTunesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            buttonInitialization(true);
 
             if (Standard.IsSelected == true)
             {
@@ -431,8 +437,6 @@ namespace MusicalTuner
 
         }
 
-
-
         private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
         {
 
@@ -441,37 +445,41 @@ namespace MusicalTuner
         private void Button_Click_FFT(object sender, RoutedEventArgs e)
         {
 
-            if (!youPressedMe)
+            if (!youPressedProcess)
             {
                 btnFFT.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
+                youPressedProcess = true;
+                recordingMode = "FFT";
+
                 sio.start();
                 sio.audioInEvent += sio_audioInEvent_FFT;
             }
-            else
+            else if (string.Equals(recordingMode, "FFT"))
             {
                 btnFFT.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedProcess = false;
                 sio.stop();
+                sio.audioInEvent -= sio_audioInEvent_FFT;
             }
 
         }
 
         private void Button_Click_ZeroCrossing(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedProcess)
             {
                 btnZero.Background = new SolidColorBrush(Colors.Green);
-
-                youPressedMe = true;
+                recordingMode = "ZC";
+                youPressedProcess = true;
                 sio.start();
                 sio.audioInEvent += sio_audioInEvent_Zero;
             }
-            else
+            else if (string.Equals(recordingMode, "ZC"))
             {
                 btnZero.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedProcess = false;
                 sio.stop();
+                sio.audioInEvent -= sio_audioInEvent_Zero;
             }
             //sio.start();
             //sio.audioInEvent += sio_audioInEvent_ZeroCrossing;
@@ -479,18 +487,22 @@ namespace MusicalTuner
 
         private void Button_Click_Autocorrelation(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedProcess)
             {
                 btnAuto.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
+                youPressedProcess = true;
+                recordingMode = "AC";
+
                 sio.start();
                 sio.audioInEvent += sio_audioInEvent_Auto;
             }
-            else
+            else if(string.Equals(recordingMode,"AC"))
             {
                 btnAuto.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedProcess = false;
                 sio.stop();
+                sio.audioInEvent -= sio_audioInEvent_Auto;
+
             }
             //sio.start();
             //sio.audioInEvent += sio_audioInEvent_AutoCorrelation;
@@ -498,33 +510,34 @@ namespace MusicalTuner
 
         private void Button_Click_String1(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedString)
             {
+                youPressedString = true;
+                selectedString = 1;
                 btnString1.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
                 if (btnString1.Content.Equals("E"))
                 {
                     pitchOutTarget.Text = "329.6";
                 }
-                else
+                else 
                 {
                     pitchOutTarget.Text = "311.1";
                 }
-
             }
-            else
+            else if(selectedString==1)
             {
                 btnString1.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedString = false;
             }
         }
 
         private void Button_Click_String2(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedString)
             {
+                youPressedString = true;
+                selectedString = 2;
                 btnString2.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
                 if (btnString2.Content.Equals("B"))
                 {
                     pitchOutTarget.Text = "246.9";
@@ -533,22 +546,22 @@ namespace MusicalTuner
                 {
                     pitchOutTarget.Text = "220.0";
                 }
-
             }
-            else
+            else if (selectedString==2)
             {
                 btnString2.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedString = false;
             }
         }
 
-
         private void Button_Click_String3(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedString)
             {
                 btnString3.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
+                youPressedString = true;
+                selectedString = 3;
+
                 if (btnString3.Content.Equals("G"))
                 {
                     pitchOutTarget.Text = "196.0";
@@ -557,60 +570,59 @@ namespace MusicalTuner
                 {
                     pitchOutTarget.Text = "196.0";
                 }
-
             }
-            else
+            else if (selectedString==3)
             {
                 btnString3.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedString = false;
             }
         }
 
         private void Button_Click_String4(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedString)
             {
                 btnString4.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
+                youPressedString = true;
+                selectedString = 4;
                 if (btnString4.Content.Equals("D"))
                 {
                     pitchOutTarget.Text = "146.8";
                 }
-
             }
-            else
+            else if (selectedString == 4)
             {
                 btnString4.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedString = false;
             }
         }
 
         private void Button_Click_String5(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedString)
             {
                 btnString5.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
+                youPressedString = true;
+                selectedString = 5;
                 if (btnString5.Content.Equals("A"))
                 {
                     pitchOutTarget.Text = "110.0";
                 }
-
             }
-            else
+            else if (selectedString == 5)
             {
                 btnString5.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedString = false;
             }
         }
 
-
         private void Button_Click_String6(object sender, RoutedEventArgs e)
         {
-            if (!youPressedMe)
+            if (!youPressedString)
             {
                 btnString6.Background = new SolidColorBrush(Colors.Green);
-                youPressedMe = true;
+                youPressedString = true;
+                selectedString = 6;
                 if (btnString6.Content.Equals("E"))
                 {
                     pitchOutTarget.Text = "82.4";
@@ -620,18 +632,12 @@ namespace MusicalTuner
                     pitchOutTarget.Text = "73.4";
                 }
             }
-            else
+            else if (selectedString == 6)
             {
                 btnString6.Background = new SolidColorBrush(Colors.Red);
-                youPressedMe = false;
+                youPressedString = false;
             }
         }
-
-
-
-
-
-
 
     }
 }
