@@ -517,10 +517,16 @@ namespace MusicalTuner
                 btnString1.Background = new SolidColorBrush(Colors.Green);
                 if (btnString1.Content.Equals("E"))
                 {
+                    this.targetFrequency = 329.6f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f; 
                     pitchOutTarget.Text = "329.6";
                 }
                 else 
                 {
+                    this.targetFrequency = 311.1f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f; ; 
                     pitchOutTarget.Text = "311.1";
                 }
             }
@@ -540,10 +546,17 @@ namespace MusicalTuner
                 btnString2.Background = new SolidColorBrush(Colors.Green);
                 if (btnString2.Content.Equals("B"))
                 {
+                    this.targetFrequency = 246.9f;
+                    this.lowFreq = this.targetFrequency -30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f; 
+
                     pitchOutTarget.Text = "246.9";
                 }
                 else
                 {
+                    this.targetFrequency = 220.0f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f; 
                     pitchOutTarget.Text = "220.0";
                 }
             }
@@ -564,10 +577,16 @@ namespace MusicalTuner
 
                 if (btnString3.Content.Equals("G"))
                 {
+                    this.targetFrequency = 196.0f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f; 
                     pitchOutTarget.Text = "196.0";
                 }
                 else
                 {
+                    this.targetFrequency = 196.0f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f;
                     pitchOutTarget.Text = "196.0";
                 }
             }
@@ -587,6 +606,9 @@ namespace MusicalTuner
                 selectedString = 4;
                 if (btnString4.Content.Equals("D"))
                 {
+                    this.targetFrequency = 146.8f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f;
                     pitchOutTarget.Text = "146.8";
                 }
             }
@@ -606,6 +628,9 @@ namespace MusicalTuner
                 selectedString = 5;
                 if (btnString5.Content.Equals("A"))
                 {
+                    this.targetFrequency = 110.0f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f;
                     pitchOutTarget.Text = "110.0";
                 }
             }
@@ -625,10 +650,16 @@ namespace MusicalTuner
                 selectedString = 6;
                 if (btnString6.Content.Equals("E"))
                 {
+                    this.targetFrequency = 82.4f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f;
                     pitchOutTarget.Text = "82.4";
                 }
                 else
                 {
+                    this.targetFrequency = 73.4f;
+                    this.lowFreq = this.targetFrequency - 30.0f;
+                    this.highFreq = this.targetFrequency + 30.0f;
                     pitchOutTarget.Text = "73.4";
                 }
             }
