@@ -30,7 +30,7 @@ namespace MusicalTuner
         private FFTWrapper fft;
         FilterDesign fd;
         Filter filt;
-        private static int bufferSize = 1920;
+        private static int bufferSize = 480*10;
 
         private bool recordingFFT = false;
         private bool recordingZero = false;
@@ -120,7 +120,7 @@ namespace MusicalTuner
             bufferPosition = (bufferPosition + data.Length) % this.buffer.Length;
             if (this.bufferPosition == 0)
             {
-                process_audio_Auto(this.buffer, 50, 1000, 3, 1);
+                process_audio_Auto(this.buffer, 50, 600, 3, 1);
             }
         }
 
@@ -129,40 +129,65 @@ namespace MusicalTuner
             if (!recordingFFT)
                 return;
 
-
             float sampleRate = sio.getInputSampleRate();
 
-            //Filling in new 1920 samples buffer
-            int i = 0;
-            ignoreSample = 1;
-            while (bufferIdxFFT < bufferFFT.Length)
+            float[] filteredData = filt.filter(data);
+            Array.Copy(filteredData, 0, this.buffer, this.bufferPosition, data.Length);
+            bufferPosition = (bufferPosition + data.Length) % this.buffer.Length;
+            if (this.bufferPosition == 0)
             {
-                bufferFFT[bufferIdxFFT] = data[i + ignoreSample];
-                bufferIdxFFT++;
-                i++;
-                if (i + ignoreSample >= data.Length)
+                uint N = Convert.ToUInt32(this.buffer.Length);
+                fft = new FFTWrapper(N);
+
+                float[] fftmag = fft.fftMag(this.buffer);
+                // Detect and display dominant freq.
+                float maxValue = fftmag.Max();
+                float maxIndex = fftmag.ToList().IndexOf(maxValue);
+                float detectedFrequencyFFT = maxIndex * (sampleRate / N);
+                bufferIdxFFT = 0;
+                recordingFFT = false;
+                Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    ignoreSample = 0;
-                    return;
-                }
+                    this.pitchOut.Text = detectedFrequencyFFT.ToString("#0.##");
+
+                });
 
             }
-            uint N = Convert.ToUInt32(bufferFFT.Length);
-            fft = new FFTWrapper(N);
-            float[] fftmag = fft.fftMag(bufferFFT);
-            // Detect and display dominant freq.
-            float maxValue = fftmag.Max();
-            float maxIndex = fftmag.ToList().IndexOf(maxValue);
-            float detectedFrequencyFFT = maxIndex * (sampleRate / N);
-            bufferIdxFFT = 0;
-            recordingFFT = false;
-            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                this.pitchOut.Text = detectedFrequencyFFT.ToString("#0.##");
 
-            });
+            //float sampleRate = sio.getInputSampleRate();
+
+            //Filling in new 1920 samples buffer
+            //int i = 0;
+            //ignoreSample = 1;
+            //while (bufferIdxFFT < bufferFFT.Length)
+            //{
+            //    bufferFFT[bufferIdxFFT] = data[i + ignoreSample];
+            //    bufferIdxFFT++;
+            //    i++;
+            //    if (i + ignoreSample >= data.Length)
+            //    {
+            //        ignoreSample = 0;
+            //        return;
+            //    }
+
+            //}
+            //uint N = Convert.ToUInt32(bufferFFT.Length);
+            //fft = new FFTWrapper(N);
+            //float[] fftmag = fft.fftMag(bufferFFT);
+            //// Detect and display dominant freq.
+            //float maxValue = fftmag.Max();
+            //float maxIndex = fftmag.ToList().IndexOf(maxValue);
+            //float detectedFrequencyFFT = maxIndex * (sampleRate / N);
+            //bufferIdxFFT = 0;
+            //recordingFFT = false;
+            //Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            //{
+            //    this.pitchOut.Text = detectedFrequencyFFT.ToString("#0.##");
+
+            //});
 
         }
+
 
         private void process_audio_Zero(float[] data)
         {
@@ -267,25 +292,50 @@ namespace MusicalTuner
                 results[period - nLowPeriodInSamples] = mean;
             }
             // find the best indices
-            int[] bestIndices = findBestCandidates(nCandidates, ref results); //note findBestCandidates modifies parameter
+            var candidates = findBestCandidates(nCandidates, ref results); //note findBestCandidates modifies parameter
+            int[] bestIndices = candidates.Item1;
+
+            //Interpolate
+            double[] bestValues = candidates.Item2;
+            double adjustedIndex = interpolate(bestIndices,bestValues);
             // convert back to Hz
-            float[] res = new float[nCandidates];
+            double[] res = new double[nCandidates];
             for (int i = 0; i < nCandidates; i++)
-                res[i] = periodInSamplesToHz(bestIndices[i] + nLowPeriodInSamples, sampleRate);
-            float detectedPitch = res[0] + 0.5f;
+                res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples), sampleRate);
+            double detectedPitch = res[0];
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 if (detectedPitch > 0)// lowFreq && detectedPitch < highFreq)
                 {
                     this.pitchOut.Text = (detectedPitch).ToString("#0.##");
-                    float pitchGage = Math.Abs(detectedPitch - this.targetFrequency);
+                    double pitchGage = Math.Abs(detectedPitch - this.targetFrequency);
                     changeColor(pitchGage);
                 }
             });
 
         }
+
+        private double interpolate(int[] bestIndices, double[] bestValues)
+
+        {
+            int[] x = bestIndices;
+            double[] y = bestValues;
+            double a0 = y[2] / (x[2] - x[0]) / (x[2] - x[1]);
+            double a1 = y[0] / (x[0] - x[2]) / (x[0] - x[1]);
+            double a2 = y[1] / (x[1] - x[2]) / (x[1] - x[0]);
+
+            double A = a0 + a1 + a2;
+            double B = -((a0 * (x[0] + x[1])) + (a1 * (x[2] + x[1])) + (a2 * (x[2] + x[0])));
+            double d2 = 2 * (((y[1] - y[0]) / (x[1] - x[0])) - ((y[0] - y[2]) / (x[0] - x[2]))) / (x[1] - x[2]);
+            double d1 = ((y[0] - y[2]) / (x[0] - x[2])) + ((d2 / 2) * (x[0] - x[2]));
+            double d0 = y[0];
+            double maxV = -d1 / d2 / 2 ;
+            double max2 = -A / B / 2 ;
+            return maxV;
+        }
+
         
-        private static int[] findBestCandidates(int n, ref double[] inputs)
+        private static Tuple<int[], double[]> findBestCandidates(int n, ref double[] inputs)
         {
             if (inputs.Length < n) throw new Exception("Length of inputs is not long enough.");
             int[] res = new int[n]; // will hold indices with the highest amounts.
@@ -303,15 +353,11 @@ namespace MusicalTuner
                 res[c] = nBestIndex;
                 values[c] = inputs[nBestIndex];
 
-
                 // now blank out that index.
                 inputs[nBestIndex] = double.MinValue;
 
             }
-            double C = values[0];
-            double A = ((values[2] + values[1]) / values[0]) / 2;
-            double B = values[1] - A - C;
-            return res;
+            return new Tuple<int[], double[]>(res, values);
         }
         
         private static int hzToPeriodInSamples(double hz, float sampleRate)
@@ -319,12 +365,12 @@ namespace MusicalTuner
             return (int)(1 / (hz / (double)sampleRate));
         }
         
-        private static float periodInSamplesToHz(int period, float sampleRate)
+        private static double periodInSamplesToHz(double period, float sampleRate)
         {
-            return 1 / (period / sampleRate);
+            return 1 / (period / (double)sampleRate);
         }
         
-        public void changeColor(float pitchDelta)
+        public void changeColor(double pitchDelta)
         {
             // Create a LinearGradientBrush and use it to 
             // paint the rectangle.
