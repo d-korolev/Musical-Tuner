@@ -143,49 +143,20 @@ namespace MusicalTuner
                 // Detect and display dominant freq.
                 float maxValue = fftmag.Max();
                 float maxIndex = fftmag.ToList().IndexOf(maxValue);
-                float detectedFrequencyFFT = maxIndex * (sampleRate / N);
+                float detectedPitch = maxIndex * (sampleRate / N);
                 bufferIdxFFT = 0;
                 recordingFFT = false;
                 Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    this.pitchOut.Text = detectedFrequencyFFT.ToString("#0.##");
-
+                    if (detectedPitch > lowFreq && detectedPitch < highFreq)
+                    {
+                        this.pitchOut.Text = (detectedPitch).ToString("#0.##");
+                        double pitchGage = (detectedPitch - this.targetFrequency);
+                        changeColor(pitchGage);
+                    }
                 });
 
             }
-
-            //float sampleRate = sio.getInputSampleRate();
-
-            //Filling in new 1920 samples buffer
-            //int i = 0;
-            //ignoreSample = 1;
-            //while (bufferIdxFFT < bufferFFT.Length)
-            //{
-            //    bufferFFT[bufferIdxFFT] = data[i + ignoreSample];
-            //    bufferIdxFFT++;
-            //    i++;
-            //    if (i + ignoreSample >= data.Length)
-            //    {
-            //        ignoreSample = 0;
-            //        return;
-            //    }
-
-            //}
-            //uint N = Convert.ToUInt32(bufferFFT.Length);
-            //fft = new FFTWrapper(N);
-            //float[] fftmag = fft.fftMag(bufferFFT);
-            //// Detect and display dominant freq.
-            //float maxValue = fftmag.Max();
-            //float maxIndex = fftmag.ToList().IndexOf(maxValue);
-            //float detectedFrequencyFFT = maxIndex * (sampleRate / N);
-            //bufferIdxFFT = 0;
-            //recordingFFT = false;
-            //Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            //{
-            //    this.pitchOut.Text = detectedFrequencyFFT.ToString("#0.##");
-
-            //});
-
         }
 
 
@@ -196,16 +167,17 @@ namespace MusicalTuner
 
 
             float sampleRate = sio.getInputSampleRate();
+            float[] filteredData = filt.filter(data);
 
-            //Filling in new 1920 samples buffer
+
             int i = 0;
             ignoreSample = 1;
             while (bufferIdx < bufferZero.Length)
             {
-                bufferZero[bufferIdx] = data[i + ignoreSample];
+                bufferZero[bufferIdx] = filteredData[i + ignoreSample];
                 bufferIdx++;
                 i++;
-                if (i + ignoreSample >= data.Length)
+                if (i + ignoreSample >= filteredData.Length)
                 {
                     // ignoreSample = 0;
                     return;
@@ -263,7 +235,12 @@ namespace MusicalTuner
 
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                this.pitchOut.Text = zeroCrossFrequencyZero.ToString("#0.##");
+                if (zeroCrossFrequencyZero > lowFreq && zeroCrossFrequencyZero < highFreq)
+                {
+                    this.pitchOut.Text = (zeroCrossFrequencyZero).ToString("#0.##");
+                    double pitchGage = (zeroCrossFrequencyZero - this.targetFrequency);
+                    changeColor(pitchGage);
+                }
 
             });
 
@@ -305,10 +282,10 @@ namespace MusicalTuner
             double detectedPitch = res[0];
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch > 0)// lowFreq && detectedPitch < highFreq)
+                if (detectedPitch >  lowFreq && detectedPitch < highFreq)
                 {
                     this.pitchOut.Text = (detectedPitch).ToString("#0.##");
-                    double pitchGage = Math.Abs(detectedPitch - this.targetFrequency);
+                    double pitchGage = (detectedPitch - this.targetFrequency);
                     changeColor(pitchGage);
                 }
             });
@@ -374,79 +351,142 @@ namespace MusicalTuner
         {
             // Create a LinearGradientBrush and use it to 
             // paint the rectangle.
-            LinearGradientBrush gradient = new LinearGradientBrush();
-            gradient.StartPoint = new Point(0.5, 0);
-            gradient.EndPoint = new Point(0.5, 1);
-            if (pitchDelta >= 0 && pitchDelta <= 2)
+            if (pitchDelta >= -2 && pitchDelta <= 2)
             {
-                GradientStop color1 = new GradientStop();
-                color1.Color = Colors.Black;
-                color1.Offset = 0;
-                gradient.GradientStops.Add(color1);
-                GradientStop color2 = new GradientStop();
-                color2.Color = Color.FromArgb(255, 114, 238, 108);
-                color2.Offset = 1;
-                gradient.GradientStops.Add(color2);
-                centerFrequency.Fill = gradient;
-                plusTen.Fill = gradient;
-                minusTen.Fill = gradient;
-                plusTwenty.Fill = gradient;
-                minusTwenty.Fill = gradient;
-                plusThirty.Fill = gradient;
-                minusThirty.Fill = gradient;
+                setColorGreen();
+            }
+            else if (pitchDelta >= -5 && pitchDelta < -2)
+            {
+                setColorRed(-1);
             }
             else if (pitchDelta > 2 && pitchDelta <= 5)
             {
-                //// Create a LinearGradientBrush and use it to 
-                //// paint the Bars
-                GradientStop color1 = new GradientStop();
-                color1.Color = Colors.Black;
-                color1.Offset = 0;
-                gradient.GradientStops.Add(color1);
-                GradientStop color2 = new GradientStop();
-                color2.Color = Color.FromArgb(
-                                              255, // Specifies the transparency of the color.
-                                              247, // Specifies the amount of red.
-                                              133, // specifies the amount of green.
-                                              18); // Specifies the amount of blue.;
-                color2.Offset = 1;
-                gradient.GradientStops.Add(color2);
-                centerFrequency.Fill = gradient;
-                plusTen.Fill = gradient;
-                minusTen.Fill = gradient;
-                plusTwenty.Fill = gradient;
-                minusTwenty.Fill = gradient;
-                plusThirty.Fill = gradient;
-                minusThirty.Fill = gradient;
-
+                setColorRed(1);
             }
-            else
+            else if (pitchDelta >= -10 && pitchDelta < -5)
             {
-                GradientStop color1 = new GradientStop();
-                color1.Color = Colors.Yellow;
-                color1.Offset = 0.2;
-                gradient.GradientStops.Add(color1);
-
-                GradientStop color2 = new GradientStop();
-                color2.Color = Colors.Orange;
-                color2.Offset = 0.5;
-                gradient.GradientStops.Add(color2);
-
-                GradientStop color3 = new GradientStop();
-                color3.Color = Colors.Red;
-                color3.Offset = 0.8;
-                gradient.GradientStops.Add(color3);
-
-                centerFrequency.Fill = gradient;
-                plusTen.Fill = gradient;
-                minusTen.Fill = gradient;
-                plusTwenty.Fill = gradient;
-                minusTwenty.Fill = gradient;
-                plusThirty.Fill = gradient;
-                minusThirty.Fill = gradient;
-
+                setColorRed(-2);
+            }
+            else if (pitchDelta > 5 && pitchDelta <= 10)
+            {
+                setColorRed(2);
+            }
+            else if (pitchDelta < -10)
+            {
+                setColorRed(-3);
+            }
+            else if (pitchDelta > 10)
+            {
+                setColorRed(3);
             }
         }
+
+        private void setColorGreen()
+        {
+                LinearGradientBrush gradient = new LinearGradientBrush();
+                gradient.StartPoint = new Point(0.5, 0);
+                gradient.EndPoint = new Point(0.5, 1);
+
+                LinearGradientBrush gradientBlack = new LinearGradientBrush();
+                gradientBlack.StartPoint = new Point(0.5, 0);
+                gradientBlack.EndPoint = new Point(0.5, 1);
+
+
+                GradientStop color1 = new GradientStop();
+                color1.Color = Color.FromArgb(255, 218, 209, 209);
+                color1.Offset = 1;
+                gradient.GradientStops.Add(color1);
+                GradientStop color2 = new GradientStop();
+                color2.Color = Colors.DarkGreen;
+                color2.Offset = 0;
+                gradient.GradientStops.Add(color2);
+                centerFrequency.Fill = gradient;
+
+
+                GradientStop blackcolor1 = new GradientStop();
+                blackcolor1.Color = Colors.Black;
+                blackcolor1.Offset = 0;
+                gradientBlack.GradientStops.Add(blackcolor1);
+                GradientStop blackcolor2 = new GradientStop();
+                blackcolor2.Color = Color.FromArgb(255, 218, 209, 209);
+                blackcolor2.Offset = 1;
+                gradientBlack.GradientStops.Add(blackcolor2);
+
+                plusTen.Fill = gradientBlack;
+                minusTen.Fill = gradientBlack;
+                plusTwenty.Fill = gradientBlack;
+                minusTwenty.Fill = gradientBlack;
+                plusThirty.Fill = gradientBlack;
+                minusThirty.Fill = gradientBlack;
+        }
+
+        private void setColorRed(int deltaFreq)
+        {
+            LinearGradientBrush gradientBlack = new LinearGradientBrush();
+            gradientBlack.StartPoint = new Point(0.5, 0);
+            gradientBlack.EndPoint = new Point(0.5, 1);
+
+            GradientStop blackcolor1 = new GradientStop();
+            blackcolor1.Color = Colors.Black;
+            blackcolor1.Offset = 0;
+            gradientBlack.GradientStops.Add(blackcolor1);
+            GradientStop blackcolor2 = new GradientStop();
+            blackcolor2.Color = Color.FromArgb(255, 218, 209, 209);
+            blackcolor2.Offset = 1;
+            gradientBlack.GradientStops.Add(blackcolor2);
+            centerFrequency.Fill = gradientBlack;
+            plusTen.Fill = gradientBlack;
+            minusTen.Fill = gradientBlack;
+            plusTwenty.Fill = gradientBlack;
+            minusTwenty.Fill = gradientBlack;
+            plusThirty.Fill = gradientBlack;
+            minusThirty.Fill = gradientBlack;
+
+            LinearGradientBrush gradient = new LinearGradientBrush();
+            gradient.StartPoint = new Point(0.5, 0);
+            gradient.EndPoint = new Point(0.5, 1);
+
+            GradientStop color1 = new GradientStop();
+            color1.Color = Colors.Red;
+            color1.Offset = 0;
+            gradient.GradientStops.Add(color1);
+
+            //GradientStop color2 = new GradientStop();
+            //color2.Color = Colors.White;
+            //color2.Offset = 0.6;
+            //gradient.GradientStops.Add(color2);
+            
+            GradientStop color3 = new GradientStop();
+            color3.Color = Colors.Gray;
+            color3.Offset = 1;
+            gradient.GradientStops.Add(color3);
+
+            if (deltaFreq == 1)
+            {
+                plusTen.Fill = gradient;
+            }
+            else if (deltaFreq == -1)
+            {
+                minusTen.Fill = gradient;
+            }
+            else if (deltaFreq == 2)
+            {
+                plusTwenty.Fill = gradient;
+            }
+            else if (deltaFreq == -2)
+            {
+                minusTwenty.Fill = gradient;
+            }
+            else if (deltaFreq == 3)
+            {
+                plusThirty.Fill = gradient;
+            }
+            else if (deltaFreq == -3)
+            {
+                minusThirty.Fill = gradient;
+            }
+        }
+
        
         private void GuiterTunesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -564,16 +604,16 @@ namespace MusicalTuner
                 if (btnString1.Content.Equals("E"))
                 {
                     this.targetFrequency = 329.6f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f; 
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f; 
                     pitchOutTarget.Text = "329.6";
                 }
                 else 
                 {
                     this.targetFrequency = 311.1f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f; ; 
-                    pitchOutTarget.Text = "311.1";
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f; ; 
+                    pitchOutTarget.Text = "294.0";
                 }
             }
             else if(selectedString==1)
@@ -593,16 +633,16 @@ namespace MusicalTuner
                 if (btnString2.Content.Equals("B"))
                 {
                     this.targetFrequency = 246.9f;
-                    this.lowFreq = this.targetFrequency -30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f; 
+                    this.lowFreq = this.targetFrequency -15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f; 
 
                     pitchOutTarget.Text = "246.9";
                 }
                 else
                 {
                     this.targetFrequency = 220.0f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f; 
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f; 
                     pitchOutTarget.Text = "220.0";
                 }
             }
@@ -624,15 +664,8 @@ namespace MusicalTuner
                 if (btnString3.Content.Equals("G"))
                 {
                     this.targetFrequency = 196.0f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f; 
-                    pitchOutTarget.Text = "196.0";
-                }
-                else
-                {
-                    this.targetFrequency = 196.0f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f;
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f; 
                     pitchOutTarget.Text = "196.0";
                 }
             }
@@ -653,8 +686,8 @@ namespace MusicalTuner
                 if (btnString4.Content.Equals("D"))
                 {
                     this.targetFrequency = 146.8f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f;
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f;
                     pitchOutTarget.Text = "146.8";
                 }
             }
@@ -675,8 +708,8 @@ namespace MusicalTuner
                 if (btnString5.Content.Equals("A"))
                 {
                     this.targetFrequency = 110.0f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f;
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f;
                     pitchOutTarget.Text = "110.0";
                 }
             }
@@ -697,15 +730,15 @@ namespace MusicalTuner
                 if (btnString6.Content.Equals("E"))
                 {
                     this.targetFrequency = 82.4f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f;
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f;
                     pitchOutTarget.Text = "82.4";
                 }
                 else
                 {
                     this.targetFrequency = 73.4f;
-                    this.lowFreq = this.targetFrequency - 30.0f;
-                    this.highFreq = this.targetFrequency + 30.0f;
+                    this.lowFreq = this.targetFrequency - 15.0f;
+                    this.highFreq = this.targetFrequency + 15.0f;
                     pitchOutTarget.Text = "73.4";
                 }
             }
