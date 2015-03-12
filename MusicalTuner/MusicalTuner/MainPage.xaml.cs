@@ -30,6 +30,8 @@ namespace MusicalTuner
         private FFTWrapper fft;
         FilterDesign fd;
         Filter filt;
+        Filter filtZC;
+
         private static int bufferSize = 480*10;
 
         private bool recordingFFT = false;
@@ -86,6 +88,8 @@ namespace MusicalTuner
             fd = new FilterDesign();
             float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.HAMMING);
             filt = new Filter(impulseResponse);
+            float[] impulseResponseZC = fd.FIRDesignWindowed(0.0f, 0.05f, WindowType.HAMMING);
+            filtZC = new Filter(impulseResponseZC);
             buttonInitialization(false);
         }
 
@@ -167,7 +171,7 @@ namespace MusicalTuner
 
 
             float sampleRate = sio.getInputSampleRate();
-            float[] filteredData = filt.filter(data);
+            float[] filteredData = filtZC.filter(data);
 
 
             int i = 0;
