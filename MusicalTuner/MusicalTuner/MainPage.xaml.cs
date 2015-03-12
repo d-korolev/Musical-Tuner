@@ -614,7 +614,7 @@ namespace MusicalTuner
                 }
                 else 
                 {
-                    this.targetFrequency = 311.1f;
+                    this.targetFrequency = 294.0f;
                     this.lowFreq = this.targetFrequency - 15.0f;
                     this.highFreq = this.targetFrequency + 15.0f; ; 
                     pitchOutTarget.Text = "294.0";
