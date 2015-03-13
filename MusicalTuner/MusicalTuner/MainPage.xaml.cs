@@ -31,13 +31,14 @@
         Filter filtZC;
 
         private static int bufferSize = 480 * 10;
+        private static int bufferSizeZero = 240 * 10;
 
         private bool recordingFFT = false;
         private bool recordingZero = false;
         private RecordingMode recordingMode;
 
         private float[] bufferAuto = new float[bufferSize];
-        private float[] bufferZero = new float[bufferSize];
+        private float[] bufferZero = new float[bufferSizeZero];
         private float[] bufferFFT = new float[bufferSize];
         private int bufferIdx = 0;
         private bool youPressedString = false;
@@ -55,8 +56,10 @@
         private bool firstPointIs = false;
         private bool lastPointIs = false;
         private int ignoreSample = 0;
-        private double total;
-        //private float totalF;
+     
+        private int meanCounter = 0;
+        private float meanFrequency = 0;
+        private float meanCalc = 0;
 
         //Auto Correlation Variables
         private float[] buffer = new float[bufferSize];
@@ -192,12 +195,13 @@
         private void process_audio_Zero(float[] data)
         {
             if (!recordingZero)
-            {
                 return;
-            }
+
 
             float sampleRate = sio.getInputSampleRate();
             float[] filteredData = filtZC.filter(data);
+
+
 
             int i = 0;
             ignoreSample = 1;
@@ -211,6 +215,7 @@
                     // ignoreSample = 0;
                     return;
                 }
+
             }
 
             uint N = Convert.ToUInt32(bufferZero.Length);
@@ -226,47 +231,55 @@
                     if (zeroCrossed && zeroCrossingCounter == 1)
                     {
                         firstPointIs = true;
-                        firstPoint = j - 1;
+                        firstPoint = j;
                     }
-                    else if (zeroCrossed && zeroCrossingCounter == 3)
+                    else if (zeroCrossed && zeroCrossingCounter == 2)
                     {
-                        lastPoint = j - 1;
+                        lastPoint = j;
                         lastPointIs = true;
-
+                        zeroCrossingCounter = 0;
+                        j--;
                     }
                 }
                 if (firstPointIs && lastPointIs)
                 {
                     sampleCounterBtwZeroCrossings = lastPoint - firstPoint;
-                    zeroCrossingCounter = 0;
+                    // zeroCrossingCounter = 0;
                     lastPointIs = false;
                     firstPointIs = false;
+                    //j = j - 2;
                     if (sampleCounterBtwZeroCrossings > 0)
                     {
-                        //zeroCrossFrequencyZero = 1 / ((sampleCounterBtwZeroCrossings * (N/sampleRate)) / N); 
-                        zeroCrossFrequencyZero = sampleRate / sampleCounterBtwZeroCrossings;
+                     
+                        zeroCrossFrequencyZero = (sampleRate / (2.0f * sampleCounterBtwZeroCrossings));
+                        meanCounter++;
+                        meanCalc += zeroCrossFrequencyZero;
+                        if (meanCounter == 12)
+                        {
+                            meanFrequency = meanCalc / meanCounter;
+                            meanCounter = 0;
+                            meanCalc = 0;
+                        }
+
                     }
+                  
 
                 }
 
-                //total += zeroCrossFrequency;
-                //if (j == 1919)
-                //{
-                //   totalF = total / j;
-                //   total = 0;
-                //}
             }
+
 
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (zeroCrossFrequencyZero > lowFreq && zeroCrossFrequencyZero < highFreq)
+                if (/*zeroCrossFrequencyZero*/meanFrequency > lowFreq && meanFrequency < highFreq)
                 {
-                    this.SetPitch(zeroCrossFrequencyZero);
-                    double pitchGage = (zeroCrossFrequencyZero - this.targetFrequency);
+                    this.pitchOut.Text = (/*zeroCrossFrequencyZero*/ meanFrequency).ToString("#0.##");
+                    double pitchGage = (/*zeroCrossFrequencyZero*/meanFrequency - this.targetFrequency);
                     changeColor(pitchGage);
                 }
 
             });
+
         }
 
         private void process_audio_Auto(float[] input, double minHz, double maxHz, int nCandidates, int nResolution)
