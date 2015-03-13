@@ -55,7 +55,7 @@ using Windows.UI.Xaml.Shapes;
         private bool firstPointIs = false;
         private bool lastPointIs = false;
         private int ignoreSample = 0;
-        //private float total;
+        private double total;
         //private float totalF;
 
         //Auto Correlation Variables
@@ -117,7 +117,8 @@ using Windows.UI.Xaml.Shapes;
             fd = new FilterDesign();
             float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.HAMMING);
             filt = new Filter(impulseResponse);
-            float[] impulseResponseZC = fd.FIRDesignWindowed(0.0f, 0.05f, WindowType.HAMMING);
+
+            float[] impulseResponseZC = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.BLACKMAN);
             filtZC = new Filter(impulseResponseZC);
             buttonInitialization(false);
         }
@@ -278,6 +279,7 @@ using Windows.UI.Xaml.Shapes;
             int nHiPeriodInSamples = hzToPeriodInSamples(minHz, sampleRate);
             if (nHiPeriodInSamples <= nLowPeriodInSamples) throw new Exception("Bad range for pitch detection.");
             float[] samples = input;
+
             if (samples.Length < nHiPeriodInSamples) throw new Exception("Not enough samples.");
 
             // yield an array of data, and then we find the index at which the value is highest.
@@ -304,9 +306,10 @@ using Windows.UI.Xaml.Shapes;
             for (int i = 0; i < nCandidates; i++)
                 res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples) + adjustedIndex, sampleRate);
             double detectedPitch = res[0];
+           
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch >  lowFreq && detectedPitch < highFreq)
+                if (detectedPitch>0)// >  lowFreq && detectedPitch < highFreq)
                 {
                     this.SetPitch(detectedPitch);
                     double pitchGage = (detectedPitch - this.targetFrequency);
@@ -434,7 +437,7 @@ using Windows.UI.Xaml.Shapes;
             }
 
             rectangle.Fill = gradient;
-        }
+            }
 
         private void GuiterTunesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -493,7 +496,7 @@ using Windows.UI.Xaml.Shapes;
                         break;
                     default:
                         throw new InvalidOperationException(this.selectedString.ToString());
-                }
+        }
             }
         }
 
@@ -516,7 +519,7 @@ using Windows.UI.Xaml.Shapes;
         }
 
         private void SetRecordingMode(Button button, RecordingMode mode, AudioInCallback audioInCallback)
-        {
+            {
             if (!this.youPressedProcess)
             {
                 button.Background = new SolidColorBrush(Colors.Green);
@@ -549,7 +552,7 @@ using Windows.UI.Xaml.Shapes;
         }
 
         private void ResetPage()
-        {
+            {
             this.SetPitch(0);
             this.ResetColor();
         }
@@ -557,12 +560,12 @@ using Windows.UI.Xaml.Shapes;
         private void Button_Click_String1(object sender, RoutedEventArgs e)
         {
             this.SelectString(btnString1, 1, 294.0f, new KeyValuePair<string, float>("E", 329.6f));
-        }
+                }
 
         private void Button_Click_String2(object sender, RoutedEventArgs e)
         {
             this.SelectString(btnString2, 2, 220.0f, new KeyValuePair<string, float>("B", 246.9f));
-        }
+                }
 
         private void Button_Click_String3(object sender, RoutedEventArgs e)
         {
@@ -570,14 +573,14 @@ using Windows.UI.Xaml.Shapes;
         }
 
         private void Button_Click_String4(object sender, RoutedEventArgs e)
-        {
+                {
             this.SelectString(btnString4, 4, 146.8f);
-        }
+                }
 
         private void Button_Click_String5(object sender, RoutedEventArgs e)
-        {
+            {
             this.SelectString(btnString5, 5, 110.0f);
-        }
+            }
 
         private void Button_Click_String6(object sender, RoutedEventArgs e)
         {
@@ -596,12 +599,12 @@ using Windows.UI.Xaml.Shapes;
                 foreach (var item in frequencies)
                 {
                     if (button.Content.Equals(item.Key))
-                    {
+            {
                         this.SetTarget(item.Value);
                         set = true;
                         break;
-                    }
-                }
+            }
+        }
 
                 if (!set)
                 {
