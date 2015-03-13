@@ -62,7 +62,7 @@ namespace MusicalTuner
         private bool firstPointIs = false;
         private bool lastPointIs = false;
         private int ignoreSample = 0;
-        //private float total;
+        private double total;
         //private float totalF;
 
         //Auto Correlation Variables
@@ -88,7 +88,8 @@ namespace MusicalTuner
             fd = new FilterDesign();
             float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.HAMMING);
             filt = new Filter(impulseResponse);
-            float[] impulseResponseZC = fd.FIRDesignWindowed(0.0f, 0.05f, WindowType.HAMMING);
+
+            float[] impulseResponseZC = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.BLACKMAN);
             filtZC = new Filter(impulseResponseZC);
             buttonInitialization(false);
         }
@@ -258,6 +259,7 @@ namespace MusicalTuner
             int nHiPeriodInSamples = hzToPeriodInSamples(minHz, sampleRate);
             if (nHiPeriodInSamples <= nLowPeriodInSamples) throw new Exception("Bad range for pitch detection.");
             float[] samples = input;
+
             if (samples.Length < nHiPeriodInSamples) throw new Exception("Not enough samples.");
 
             // yield an array of data, and then we find the index at which the value is highest.
@@ -282,11 +284,12 @@ namespace MusicalTuner
             // convert back to Hz
             double[] res = new double[nCandidates];
             for (int i = 0; i < nCandidates; i++)
-                res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples), sampleRate);
+                res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples) , sampleRate);
             double detectedPitch = res[0];
+           
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch >  lowFreq && detectedPitch < highFreq)
+                if (detectedPitch>0)// >  lowFreq && detectedPitch < highFreq)
                 {
                     this.pitchOut.Text = (detectedPitch).ToString("#0.##");
                     double pitchGage = (detectedPitch - this.targetFrequency);
@@ -301,18 +304,23 @@ namespace MusicalTuner
         {
             int[] x = bestIndices;
             double[] y = bestValues;
-            double a0 = y[2] / (x[2] - x[0]) / (x[2] - x[1]);
-            double a1 = y[0] / (x[0] - x[2]) / (x[0] - x[1]);
-            double a2 = y[1] / (x[1] - x[2]) / (x[1] - x[0]);
+            //double a0 = y[2] / (x[2] - x[0]) / (x[2] - x[1]);
+            //double a1 = y[0] / (x[0] - x[2]) / (x[0] - x[1]);
+            //double a2 = y[1] / (x[1] - x[2]) / (x[1] - x[0]);
 
-            double A = a0 + a1 + a2;
-            double B = -((a0 * (x[0] + x[1])) + (a1 * (x[2] + x[1])) + (a2 * (x[2] + x[0])));
-            double d2 = 2 * (((y[1] - y[0]) / (x[1] - x[0])) - ((y[0] - y[2]) / (x[0] - x[2]))) / (x[1] - x[2]);
-            double d1 = ((y[0] - y[2]) / (x[0] - x[2])) + ((d2 / 2) * (x[0] - x[2]));
-            double d0 = y[0];
-            double maxV = -d1 / d2 / 2 ;
-            double max2 = -A / B / 2 ;
-            return maxV;
+            //double A = a0 + a1 + a2;
+            //double B = -((a0 * (x[0] + x[1])) + (a1 * (x[2] + x[1])) + (a2 * (x[2] + x[0])));
+            
+            
+            //double d2 = 2 * (((y[1] - y[0]) / (x[1] - x[0])) - ((y[0] - y[2]) / (x[0] - x[2]))) / (x[1] - x[2]);
+            //double d1 = ((y[0] - y[2]) / (x[0] - x[2])) + ((d2 / 2) * (x[0] - x[2]));
+            //double d0 = y[0];
+            //double maxV = -d1 / d2 / 2;
+            //double max2 = -A / B / 2;
+            double deltam = (y[1] - y[2]) / (2 * y[0] - y[1] - y[2]) / 2;
+            double deltaG = Math.Log(y[1] / y[2]) / Math.Log(Math.Pow(y[0],2.0) / y[1] / y[2])/2 ;
+
+            return deltam;
         }
 
         
