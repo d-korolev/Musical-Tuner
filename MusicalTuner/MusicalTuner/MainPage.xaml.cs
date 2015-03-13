@@ -1,30 +1,28 @@
-﻿using System;
+﻿namespace MusicalTuner
+{
+    using FFTW;
+using libfilter;
+using libsound;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using libsound;
-using libfilter;
-using FFTW;
-using Windows.Media;
-using Windows.UI;
-
-
-namespace MusicalTuner
-{
-
+using Windows.UI.Xaml.Shapes;
 
     public sealed partial class MainPage : Page
     {
+        enum RecordingMode
+        {
+            Fft,
+            Zc,
+            Ac,
+        }
+
         private SoundIO sio;
 
         private FFTWrapper fft;
@@ -36,14 +34,12 @@ namespace MusicalTuner
 
         private bool recordingFFT = false;
         private bool recordingZero = false;
-        private bool recordingAuto = false;
-        private string recordingMode;
+        private RecordingMode recordingMode;
 
         private float[] bufferAuto = new float[bufferSize];
         private float[] bufferZero = new float[bufferSize];
         private float[] bufferFFT = new float[bufferSize];
         private int bufferIdx = 0;
-        private int bufferIdxFFT = 0;
         private bool youPressedString = false;
         private bool youPressedProcess = false;
 
@@ -54,10 +50,7 @@ namespace MusicalTuner
         private int zeroCrossingCounter;
         private bool zeroCrossed = false;
         private float zeroCrossFrequencyZero;
-        private float zeroCrossFrequencyFFT;
-        private float zeroCrossTime;
         private int sampleCounterBtwZeroCrossings;
-        private float zeroCrossPeriod;
         private int firstPoint, lastPoint;
         private bool firstPointIs = false;
         private bool lastPointIs = false;
@@ -70,13 +63,49 @@ namespace MusicalTuner
         private int bufferPosition = 0;
         private float targetFrequency;
         private float lowFreq, highFreq;
-
+        private readonly LinearGradientBrush gradientBlack = new LinearGradientBrush();
+        private readonly LinearGradientBrush gradientRed = new LinearGradientBrush();
+        private readonly LinearGradientBrush gradientGreen = new LinearGradientBrush();
 
         public MainPage()
         {
             this.InitializeComponent();
 
             this.NavigationCacheMode = NavigationCacheMode.Required;
+
+            GradientStop black1 = new GradientStop();
+            GradientStop black2 = new GradientStop();
+            GradientStop green1 = new GradientStop();
+            GradientStop green2 = new GradientStop();
+            GradientStop red1 = new GradientStop();
+            GradientStop red2 = new GradientStop();
+
+            black1.Color = Colors.Black;
+            black1.Offset = 0;
+            black2.Color = Color.FromArgb(255, 218, 209, 209);
+            black2.Offset = 1;
+
+            green1.Color = Color.FromArgb(255, 218, 209, 209);
+            green1.Offset = 1;
+            green2.Color = Colors.DarkGreen;
+            green2.Offset = 0;
+
+            red1.Color = Colors.Red;
+            red1.Offset = 0;
+            red2.Color = Colors.Gray;
+            red2.Offset = 1;
+
+            this.SetGradientColors(this.gradientGreen, green1, green2);
+            this.SetGradientColors(this.gradientRed, red1, red2);
+            this.SetGradientColors(this.gradientBlack, black1, black2);
+        }
+
+        private void SetGradientColors(LinearGradientBrush gradient, GradientStop color1, GradientStop color2)
+        {
+            gradient.StartPoint = new Point(0.5, 0);
+            gradient.EndPoint = new Point(0.5, 1);
+            gradient.GradientStops.Add(color1);
+            gradient.GradientStops.Add(color2);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -115,10 +144,8 @@ namespace MusicalTuner
             process_audio_Zero(data);
         }
 
-
         void sio_audioInEvent_Auto(float[] data)
         {
-            recordingAuto = true;
             float[] filteredData = filt.filter(data);
             Array.Copy(filteredData, 0, this.buffer, this.bufferPosition, data.Length);
             bufferPosition = (bufferPosition + data.Length) % this.buffer.Length;
@@ -148,7 +175,6 @@ namespace MusicalTuner
                 float maxValue = fftmag.Max();
                 float maxIndex = fftmag.ToList().IndexOf(maxValue);
                 float detectedPitch = maxIndex * (sampleRate / N);
-                bufferIdxFFT = 0;
                 recordingFFT = false;
                 Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
@@ -159,16 +185,15 @@ namespace MusicalTuner
                         changeColor(pitchGage);
                     }
                 });
-
             }
         }
-
 
         private void process_audio_Zero(float[] data)
         {
             if (!recordingZero)
+            {
                 return;
-
+            }
 
             float sampleRate = sio.getInputSampleRate();
             float[] filteredData = filtZC.filter(data);
@@ -225,29 +250,24 @@ namespace MusicalTuner
 
                 }
 
-
                 //total += zeroCrossFrequency;
                 //if (j == 1919)
                 //{
                 //   totalF = total / j;
                 //   total = 0;
                 //}
-
-
             }
-
 
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 if (zeroCrossFrequencyZero > lowFreq && zeroCrossFrequencyZero < highFreq)
                 {
-                    this.pitchOut.Text = (zeroCrossFrequencyZero).ToString("#0.##");
+                    this.SetPitch(zeroCrossFrequencyZero);
                     double pitchGage = (zeroCrossFrequencyZero - this.targetFrequency);
                     changeColor(pitchGage);
                 }
 
             });
-
         }
 
         private void process_audio_Auto(float[] input, double minHz, double maxHz, int nCandidates, int nResolution)
@@ -282,13 +302,13 @@ namespace MusicalTuner
             // convert back to Hz
             double[] res = new double[nCandidates];
             for (int i = 0; i < nCandidates; i++)
-                res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples), sampleRate);
+                res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples) + adjustedIndex, sampleRate);
             double detectedPitch = res[0];
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 if (detectedPitch >  lowFreq && detectedPitch < highFreq)
                 {
-                    this.pitchOut.Text = (detectedPitch).ToString("#0.##");
+                    this.SetPitch(detectedPitch);
                     double pitchGage = (detectedPitch - this.targetFrequency);
                     changeColor(pitchGage);
                 }
@@ -297,25 +317,15 @@ namespace MusicalTuner
         }
 
         private double interpolate(int[] bestIndices, double[] bestValues)
-
         {
             int[] x = bestIndices;
             double[] y = bestValues;
-            double a0 = y[2] / (x[2] - x[0]) / (x[2] - x[1]);
-            double a1 = y[0] / (x[0] - x[2]) / (x[0] - x[1]);
-            double a2 = y[1] / (x[1] - x[2]) / (x[1] - x[0]);
+            double deltam = (y[1] - y[2]) / (2 * y[0] - y[1] - y[2]) / 2;
+            double deltaG = Math.Log(y[1] / y[2]) / Math.Log(Math.Pow(y[0], 2.0) / y[1] / y[2]) / 2;
 
-            double A = a0 + a1 + a2;
-            double B = -((a0 * (x[0] + x[1])) + (a1 * (x[2] + x[1])) + (a2 * (x[2] + x[0])));
-            double d2 = 2 * (((y[1] - y[0]) / (x[1] - x[0])) - ((y[0] - y[2]) / (x[0] - x[2]))) / (x[1] - x[2]);
-            double d1 = ((y[0] - y[2]) / (x[0] - x[2])) + ((d2 / 2) * (x[0] - x[2]));
-            double d0 = y[0];
-            double maxV = -d1 / d2 / 2 ;
-            double max2 = -A / B / 2 ;
-            return maxV;
+            return deltam;
         }
 
-        
         private static Tuple<int[], double[]> findBestCandidates(int n, ref double[] inputs)
         {
             if (inputs.Length < n) throw new Exception("Length of inputs is not long enough.");
@@ -338,6 +348,7 @@ namespace MusicalTuner
                 inputs[nBestIndex] = double.MinValue;
 
             }
+
             return new Tuple<int[], double[]>(res, values);
         }
         
@@ -355,143 +366,76 @@ namespace MusicalTuner
         {
             // Create a LinearGradientBrush and use it to 
             // paint the rectangle.
-            if (pitchDelta >= -2 && pitchDelta <= 2)
+            double absDelta = Math.Abs(pitchDelta);
+            int deltaFreq;
+            if (absDelta > 10)
             {
-                setColorGreen();
+                deltaFreq = 3;
             }
-            else if (pitchDelta >= -5 && pitchDelta < -2)
+            else if (absDelta > 5)
             {
-                setColorRed(-1);
+                deltaFreq = 2;
             }
-            else if (pitchDelta > 2 && pitchDelta <= 5)
+            else if (absDelta > 2)
             {
-                setColorRed(1);
+                deltaFreq = 1;
             }
-            else if (pitchDelta >= -10 && pitchDelta < -5)
+            else
             {
-                setColorRed(-2);
+                deltaFreq = 0;
             }
-            else if (pitchDelta > 5 && pitchDelta <= 10)
-            {
-                setColorRed(2);
-            }
-            else if (pitchDelta < -10)
-            {
-                setColorRed(-3);
-            }
-            else if (pitchDelta > 10)
-            {
-                setColorRed(3);
-            }
+
+            this.SetColor(deltaFreq * Math.Sign(pitchDelta));
         }
 
-        private void setColorGreen()
+        private void ResetColor()
         {
-                LinearGradientBrush gradient = new LinearGradientBrush();
-                gradient.StartPoint = new Point(0.5, 0);
-                gradient.EndPoint = new Point(0.5, 1);
-
-                LinearGradientBrush gradientBlack = new LinearGradientBrush();
-                gradientBlack.StartPoint = new Point(0.5, 0);
-                gradientBlack.EndPoint = new Point(0.5, 1);
-
-
-                GradientStop color1 = new GradientStop();
-                color1.Color = Color.FromArgb(255, 218, 209, 209);
-                color1.Offset = 1;
-                gradient.GradientStops.Add(color1);
-                GradientStop color2 = new GradientStop();
-                color2.Color = Colors.DarkGreen;
-                color2.Offset = 0;
-                gradient.GradientStops.Add(color2);
-                centerFrequency.Fill = gradient;
-
-
-                GradientStop blackcolor1 = new GradientStop();
-                blackcolor1.Color = Colors.Black;
-                blackcolor1.Offset = 0;
-                gradientBlack.GradientStops.Add(blackcolor1);
-                GradientStop blackcolor2 = new GradientStop();
-                blackcolor2.Color = Color.FromArgb(255, 218, 209, 209);
-                blackcolor2.Offset = 1;
-                gradientBlack.GradientStops.Add(blackcolor2);
-
-                plusTen.Fill = gradientBlack;
-                minusTen.Fill = gradientBlack;
-                plusTwenty.Fill = gradientBlack;
-                minusTwenty.Fill = gradientBlack;
-                plusThirty.Fill = gradientBlack;
-                minusThirty.Fill = gradientBlack;
+            centerFrequency.Fill = this.gradientBlack;
+            plusTen.Fill = this.gradientBlack;
+            minusTen.Fill = this.gradientBlack;
+            plusTwenty.Fill = this.gradientBlack;
+            minusTwenty.Fill = this.gradientBlack;
+            plusThirty.Fill = this.gradientBlack;
+            minusThirty.Fill = this.gradientBlack;
         }
 
-        private void setColorRed(int deltaFreq)
+        private void SetColor(int deltaFreq)
         {
-            LinearGradientBrush gradientBlack = new LinearGradientBrush();
-            gradientBlack.StartPoint = new Point(0.5, 0);
-            gradientBlack.EndPoint = new Point(0.5, 1);
+            this.ResetColor();
 
-            GradientStop blackcolor1 = new GradientStop();
-            blackcolor1.Color = Colors.Black;
-            blackcolor1.Offset = 0;
-            gradientBlack.GradientStops.Add(blackcolor1);
-            GradientStop blackcolor2 = new GradientStop();
-            blackcolor2.Color = Color.FromArgb(255, 218, 209, 209);
-            blackcolor2.Offset = 1;
-            gradientBlack.GradientStops.Add(blackcolor2);
-            centerFrequency.Fill = gradientBlack;
-            plusTen.Fill = gradientBlack;
-            minusTen.Fill = gradientBlack;
-            plusTwenty.Fill = gradientBlack;
-            minusTwenty.Fill = gradientBlack;
-            plusThirty.Fill = gradientBlack;
-            minusThirty.Fill = gradientBlack;
+            Rectangle rectangle;
+            LinearGradientBrush gradient = this.gradientRed;
+            switch (deltaFreq)
+            {
+                case -3:
+                    rectangle = minusThirty;
+                    break;
+                case -2:
+                    rectangle = minusTwenty;
+                    break;
+                case -1:
+                    rectangle = minusTen;
+                    break;
+                case 0:
+                    rectangle = centerFrequency;
+                    gradient = this.gradientGreen;
+                    break;
+                case 1:
+                    rectangle = plusTen;
+                    break;
+                case 2:
+                    rectangle = plusTwenty;
+                    break;
+                case 3:
+                    rectangle = plusThirty;
+                    break;
+                default:
+                    throw new InvalidOperationException(deltaFreq.ToString());
+            }
 
-            LinearGradientBrush gradient = new LinearGradientBrush();
-            gradient.StartPoint = new Point(0.5, 0);
-            gradient.EndPoint = new Point(0.5, 1);
-
-            GradientStop color1 = new GradientStop();
-            color1.Color = Colors.Red;
-            color1.Offset = 0;
-            gradient.GradientStops.Add(color1);
-
-            //GradientStop color2 = new GradientStop();
-            //color2.Color = Colors.White;
-            //color2.Offset = 0.6;
-            //gradient.GradientStops.Add(color2);
-            
-            GradientStop color3 = new GradientStop();
-            color3.Color = Colors.Gray;
-            color3.Offset = 1;
-            gradient.GradientStops.Add(color3);
-
-            if (deltaFreq == 1)
-            {
-                plusTen.Fill = gradient;
-            }
-            else if (deltaFreq == -1)
-            {
-                minusTen.Fill = gradient;
-            }
-            else if (deltaFreq == 2)
-            {
-                plusTwenty.Fill = gradient;
-            }
-            else if (deltaFreq == -2)
-            {
-                minusTwenty.Fill = gradient;
-            }
-            else if (deltaFreq == 3)
-            {
-                plusThirty.Fill = gradient;
-            }
-            else if (deltaFreq == -3)
-            {
-                minusThirty.Fill = gradient;
-            }
+            rectangle.Fill = gradient;
         }
 
-       
         private void GuiterTunesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             buttonInitialization(true);
@@ -525,233 +469,150 @@ namespace MusicalTuner
                 btnString6.Content = "D";
             }
 
+            if (this.youPressedString)
+            {
+                switch (this.selectedString)
+                {
+                    case 1:
+                        this.Button_Click_String1(sender, e);
+                        break;
+                    case 2:
+                        this.Button_Click_String2(sender, e);
+                        break;
+                    case 3:
+                        this.Button_Click_String3(sender, e);
+                        break;
+                    case 4:
+                        this.Button_Click_String4(sender, e);
+                        break;
+                    case 5:
+                        this.Button_Click_String5(sender, e);
+                        break;
+                    case 6:
+                        this.Button_Click_String6(sender, e);
+                        break;
+                    default:
+                        throw new InvalidOperationException(this.selectedString.ToString());
+                }
+            }
         }
 
-        private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        private void SetPitch(double value)
         {
+            this.pitchOut.Text = value.ToString("F2");
+        }
 
+        private void SetTarget(float value)
+        {
+            this.targetFrequency = value;
+            this.pitchOutTarget.Text = value.ToString("F2");
+            this.lowFreq = value - 15.0f;
+            this.highFreq = value + 15.0f;
         }
 
         private void Button_Click_FFT(object sender, RoutedEventArgs e)
         {
+            this.SetRecordingMode(this.btnFFT, RecordingMode.Fft, this.sio_audioInEvent_FFT);
+        }
 
-            if (!youPressedProcess)
+        private void SetRecordingMode(Button button, RecordingMode mode, AudioInCallback audioInCallback)
+        {
+            if (!this.youPressedProcess)
             {
-                btnFFT.Background = new SolidColorBrush(Colors.Green);
-                youPressedProcess = true;
-                recordingMode = "FFT";
+                button.Background = new SolidColorBrush(Colors.Green);
+                this.recordingMode = mode;
+                this.youPressedProcess = true;
 
-                sio.start();
-                sio.audioInEvent += sio_audioInEvent_FFT;
+                this.sio.start();
+                this.sio.audioInEvent += audioInCallback;
+                this.SetTarget(this.targetFrequency);
             }
-            else if (string.Equals(recordingMode, "FFT"))
+            else if (this.recordingMode == mode)
             {
-                btnFFT.Background = new SolidColorBrush(Colors.Red);
-                youPressedProcess = false;
-                sio.stop();
-                sio.audioInEvent -= sio_audioInEvent_FFT;
-            }
+                button.Background = new SolidColorBrush(Colors.Red);
+                this.youPressedProcess = false;
 
+                this.sio.stop();
+                this.sio.audioInEvent -= audioInCallback;
+                this.ResetPage();
+            }
         }
 
         private void Button_Click_ZeroCrossing(object sender, RoutedEventArgs e)
         {
-            if (!youPressedProcess)
-            {
-                btnZero.Background = new SolidColorBrush(Colors.Green);
-                recordingMode = "ZC";
-                youPressedProcess = true;
-                sio.start();
-                sio.audioInEvent += sio_audioInEvent_Zero;
-            }
-            else if (string.Equals(recordingMode, "ZC"))
-            {
-                btnZero.Background = new SolidColorBrush(Colors.Red);
-                youPressedProcess = false;
-                sio.stop();
-                sio.audioInEvent -= sio_audioInEvent_Zero;
-            }
-            //sio.start();
-            //sio.audioInEvent += sio_audioInEvent_ZeroCrossing;
+            this.SetRecordingMode(this.btnZero, RecordingMode.Zc, this.sio_audioInEvent_Zero);
         }
 
         private void Button_Click_Autocorrelation(object sender, RoutedEventArgs e)
         {
-            if (!youPressedProcess)
-            {
-                btnAuto.Background = new SolidColorBrush(Colors.Green);
-                youPressedProcess = true;
-                recordingMode = "AC";
+            this.SetRecordingMode(this.btnAuto, RecordingMode.Ac, this.sio_audioInEvent_Auto);
+        }
 
-                sio.start();
-                sio.audioInEvent += sio_audioInEvent_Auto;
-            }
-            else if(string.Equals(recordingMode,"AC"))
-            {
-                btnAuto.Background = new SolidColorBrush(Colors.Red);
-                youPressedProcess = false;
-                sio.stop();
-                sio.audioInEvent -= sio_audioInEvent_Auto;
-
-            }
-            //sio.start();
-            //sio.audioInEvent += sio_audioInEvent_AutoCorrelation;
+        private void ResetPage()
+        {
+            this.SetPitch(0);
+            this.ResetColor();
         }
 
         private void Button_Click_String1(object sender, RoutedEventArgs e)
         {
-            if (!youPressedString)
-            {
-                youPressedString = true;
-                selectedString = 1;
-                btnString1.Background = new SolidColorBrush(Colors.Green);
-                if (btnString1.Content.Equals("E"))
-                {
-                    this.targetFrequency = 329.6f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f; 
-                    pitchOutTarget.Text = "329.6";
-                }
-                else 
-                {
-                    this.targetFrequency = 294.0f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f; ; 
-                    pitchOutTarget.Text = "294.0";
-                }
-            }
-            else if(selectedString==1)
-            {
-                btnString1.Background = new SolidColorBrush(Colors.Red);
-                youPressedString = false;
-            }
+            this.SelectString(btnString1, 1, 294.0f, new KeyValuePair<string, float>("E", 329.6f));
         }
 
         private void Button_Click_String2(object sender, RoutedEventArgs e)
         {
-            if (!youPressedString)
-            {
-                youPressedString = true;
-                selectedString = 2;
-                btnString2.Background = new SolidColorBrush(Colors.Green);
-                if (btnString2.Content.Equals("B"))
-                {
-                    this.targetFrequency = 246.9f;
-                    this.lowFreq = this.targetFrequency -15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f; 
-
-                    pitchOutTarget.Text = "246.9";
-                }
-                else
-                {
-                    this.targetFrequency = 220.0f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f; 
-                    pitchOutTarget.Text = "220.0";
-                }
-            }
-            else if (selectedString==2)
-            {
-                btnString2.Background = new SolidColorBrush(Colors.Red);
-                youPressedString = false;
-            }
+            this.SelectString(btnString2, 2, 220.0f, new KeyValuePair<string, float>("B", 246.9f));
         }
 
         private void Button_Click_String3(object sender, RoutedEventArgs e)
         {
-            if (!youPressedString)
-            {
-                btnString3.Background = new SolidColorBrush(Colors.Green);
-                youPressedString = true;
-                selectedString = 3;
-
-                if (btnString3.Content.Equals("G"))
-                {
-                    this.targetFrequency = 196.0f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f; 
-                    pitchOutTarget.Text = "196.0";
-                }
-            }
-            else if (selectedString==3)
-            {
-                btnString3.Background = new SolidColorBrush(Colors.Red);
-                youPressedString = false;
-            }
+            this.SelectString(btnString3, 3, 196.0f);
         }
 
         private void Button_Click_String4(object sender, RoutedEventArgs e)
         {
-            if (!youPressedString)
-            {
-                btnString4.Background = new SolidColorBrush(Colors.Green);
-                youPressedString = true;
-                selectedString = 4;
-                if (btnString4.Content.Equals("D"))
-                {
-                    this.targetFrequency = 146.8f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f;
-                    pitchOutTarget.Text = "146.8";
-                }
-            }
-            else if (selectedString == 4)
-            {
-                btnString4.Background = new SolidColorBrush(Colors.Red);
-                youPressedString = false;
-            }
+            this.SelectString(btnString4, 4, 146.8f);
         }
 
         private void Button_Click_String5(object sender, RoutedEventArgs e)
         {
-            if (!youPressedString)
-            {
-                btnString5.Background = new SolidColorBrush(Colors.Green);
-                youPressedString = true;
-                selectedString = 5;
-                if (btnString5.Content.Equals("A"))
-                {
-                    this.targetFrequency = 110.0f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f;
-                    pitchOutTarget.Text = "110.0";
-                }
-            }
-            else if (selectedString == 5)
-            {
-                btnString5.Background = new SolidColorBrush(Colors.Red);
-                youPressedString = false;
-            }
+            this.SelectString(btnString5, 5, 110.0f);
         }
 
         private void Button_Click_String6(object sender, RoutedEventArgs e)
         {
+            this.SelectString(btnString6, 6, 73.4f, new KeyValuePair<string, float>("E", 82.4f));
+        }
+
+        private void SelectString(Button button, int selection, float defaultFrequency, params KeyValuePair<string, float>[] frequencies)
+        {
             if (!youPressedString)
             {
-                btnString6.Background = new SolidColorBrush(Colors.Green);
+                button.Background = new SolidColorBrush(Colors.Green);
                 youPressedString = true;
-                selectedString = 6;
-                if (btnString6.Content.Equals("E"))
+                selectedString = selection;
+
+                bool set = false;
+                foreach (var item in frequencies)
                 {
-                    this.targetFrequency = 82.4f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f;
-                    pitchOutTarget.Text = "82.4";
+                    if (button.Content.Equals(item.Key))
+                    {
+                        this.SetTarget(item.Value);
+                        set = true;
+                        break;
+                    }
                 }
-                else
+
+                if (!set)
                 {
-                    this.targetFrequency = 73.4f;
-                    this.lowFreq = this.targetFrequency - 15.0f;
-                    this.highFreq = this.targetFrequency + 15.0f;
-                    pitchOutTarget.Text = "73.4";
+                    this.SetTarget(defaultFrequency);
                 }
             }
-            else if (selectedString == 6)
+            else if (selectedString == selection)
             {
-                btnString6.Background = new SolidColorBrush(Colors.Red);
+                button.Background = new SolidColorBrush(Colors.Red);
                 youPressedString = false;
             }
         }
-
     }
 }

@@ -21,7 +21,7 @@
             <ComboBoxItem Content="DADGAD Tune" Name="DadGad" HorizontalAlignment="Center"/>
 
         </ComboBox>
-        <TextBlock Name="pitchOut" Text="000.0" HorizontalAlignment="Left" Margin="185,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="56" SelectionChanged="TextBlock_SelectionChanged" FontSize="20"/>
+        <TextBlock Name="pitchOut" Text="000.0" HorizontalAlignment="Left" Margin="185,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="56" FontSize="20"/>
         <Button x:Name="btnFFT" Content="FFT" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,556,0,0" FontSize="14" Click="Button_Click_FFT" Background="red"/>
         <Button x:Name="btnAuto" Content="Autocorrelation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="248,556,0,0" FontSize="14" Click="Button_Click_Autocorrelation" Background="red"/>
         <Button x:Name="btnZero" Content="Zero Crossing" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,556,0,0" FontSize="14" Click="Button_Click_ZeroCrossing" Background="red"/>
@@ -90,7 +90,7 @@
                 </LinearGradientBrush>
             </Rectangle.Fill>
         </Rectangle>
-        <TextBlock x:Name="pitchOutTarget" Text="000.0" HorizontalAlignment="Left" Margin="185,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="52" SelectionChanged="TextBlock_SelectionChanged" FontSize="20"/>
+        <TextBlock x:Name="pitchOutTarget" Text="000.0" HorizontalAlignment="Left" Margin="185,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="52" FontSize="20"/>
         <TextBlock HorizontalAlignment="Left" Margin="125,237,0,0" TextWrapping="Wrap" Text="Pitch:" VerticalAlignment="Top" Height="20" Width="46" FontSize="18"/>
         <TextBlock HorizontalAlignment="Left" Margin="115,269,0,0" TextWrapping="Wrap" Text="Target:" VerticalAlignment="Top" Height="20" Width="56" FontSize="18"/>
         <TextBlock HorizontalAlignment="Left" Margin="246,237,0,0" TextWrapping="Wrap" Text="Hz" VerticalAlignment="Top" Height="20" Width="21" FontSize="18"/>
