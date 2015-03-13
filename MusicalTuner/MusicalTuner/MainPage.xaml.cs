@@ -181,7 +181,7 @@
                 {
                     if (detectedPitch > lowFreq && detectedPitch < highFreq)
                     {
-                        this.pitchOut.Text = (detectedPitch).ToString("#0.##");
+                        this.SetPitch(0);
                         double pitchGage = (detectedPitch - this.targetFrequency);
                         changeColor(pitchGage);
                     }
@@ -199,7 +199,6 @@
             float sampleRate = sio.getInputSampleRate();
             float[] filteredData = filtZC.filter(data);
 
-
             int i = 0;
             ignoreSample = 1;
             while (bufferIdx < bufferZero.Length)
@@ -212,7 +211,6 @@
                     // ignoreSample = 0;
                     return;
                 }
-
             }
 
             uint N = Convert.ToUInt32(bufferZero.Length);
@@ -280,7 +278,10 @@
             if (nHiPeriodInSamples <= nLowPeriodInSamples) throw new Exception("Bad range for pitch detection.");
             float[] samples = input;
 
-            if (samples.Length < nHiPeriodInSamples) throw new Exception("Not enough samples.");
+            if (samples.Length < nHiPeriodInSamples)
+            {
+                throw new Exception("Not enough samples.");
+            }
 
             // yield an array of data, and then we find the index at which the value is highest.
             double[] results = new double[nHiPeriodInSamples - nLowPeriodInSamples];
@@ -289,11 +290,14 @@
                 double sum = 0;
                 // for each sample, find correlation. (If they are far apart, small)
                 for (int i = 0; i < samples.Length - period; i++)
+                {
                     sum += samples[i] * samples[i + period];
+                }
 
                 double mean = sum / (double)samples.Length;
                 results[period - nLowPeriodInSamples] = mean;
             }
+
             // find the best indices
             var candidates = findBestCandidates(nCandidates, ref results); //note findBestCandidates modifies parameter
             int[] bestIndices = candidates.Item1;
@@ -304,12 +308,15 @@
             // convert back to Hz
             double[] res = new double[nCandidates];
             for (int i = 0; i < nCandidates; i++)
+            {
                 res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples) + adjustedIndex, sampleRate);
+            }
+
             double detectedPitch = res[0];
 
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch > 0)// >  lowFreq && detectedPitch < highFreq)
+                if (detectedPitch >  lowFreq && detectedPitch < highFreq)
                 {
                     this.SetPitch(detectedPitch);
                     double pitchGage = (detectedPitch - this.targetFrequency);
@@ -341,7 +348,12 @@
                 double fBestValue = double.MinValue;
                 int nBestIndex = -1;
                 for (int i = 0; i < inputs.Length; i++)
-                    if (inputs[i] > fBestValue) { nBestIndex = i; fBestValue = inputs[i]; }
+                {
+                    if (inputs[i] > fBestValue)
+                    {
+                        nBestIndex = i; fBestValue = inputs[i];
+                    }
+                }
 
                 // record this highest value
                 res[c] = nBestIndex;
