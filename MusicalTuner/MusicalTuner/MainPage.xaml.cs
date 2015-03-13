@@ -1,18 +1,18 @@
 ﻿namespace MusicalTuner
 {
     using FFTW;
-using libfilter;
-using libsound;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.Foundation;
-using Windows.UI;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Shapes;
+    using libfilter;
+    using libsound;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Windows.Foundation;
+    using Windows.UI;
+    using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Controls;
+    using Windows.UI.Xaml.Media;
+    using Windows.UI.Xaml.Navigation;
+    using Windows.UI.Xaml.Shapes;
 
     public sealed partial class MainPage : Page
     {
@@ -30,7 +30,7 @@ using Windows.UI.Xaml.Shapes;
         Filter filt;
         Filter filtZC;
 
-        private static int bufferSize = 480*10;
+        private static int bufferSize = 480 * 10;
 
         private bool recordingFFT = false;
         private bool recordingZero = false;
@@ -118,7 +118,7 @@ using Windows.UI.Xaml.Shapes;
             float[] impulseResponse = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.HAMMING);
             filt = new Filter(impulseResponse);
 
-            float[] impulseResponseZC = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.BLACKMAN);
+            float[] impulseResponseZC = fd.FIRDesignWindowed(0.0f, 0.1f, WindowType.HAMMING);
             filtZC = new Filter(impulseResponseZC);
             buttonInitialization(false);
         }
@@ -300,16 +300,16 @@ using Windows.UI.Xaml.Shapes;
 
             //Interpolate
             double[] bestValues = candidates.Item2;
-            double adjustedIndex = interpolate(bestIndices,bestValues);
+            double adjustedIndex = interpolate(bestIndices, bestValues);
             // convert back to Hz
             double[] res = new double[nCandidates];
             for (int i = 0; i < nCandidates; i++)
                 res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples) + adjustedIndex, sampleRate);
             double detectedPitch = res[0];
-           
+
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch>0)// >  lowFreq && detectedPitch < highFreq)
+                if (detectedPitch > 0)// >  lowFreq && detectedPitch < highFreq)
                 {
                     this.SetPitch(detectedPitch);
                     double pitchGage = (detectedPitch - this.targetFrequency);
@@ -354,17 +354,17 @@ using Windows.UI.Xaml.Shapes;
 
             return new Tuple<int[], double[]>(res, values);
         }
-        
+
         private static int hzToPeriodInSamples(double hz, float sampleRate)
         {
             return (int)(1 / (hz / (double)sampleRate));
         }
-        
+
         private static double periodInSamplesToHz(double period, float sampleRate)
         {
             return 1 / (period / (double)sampleRate);
         }
-        
+
         public void changeColor(double pitchDelta)
         {
             // Create a LinearGradientBrush and use it to 
@@ -437,7 +437,7 @@ using Windows.UI.Xaml.Shapes;
             }
 
             rectangle.Fill = gradient;
-            }
+        }
 
         private void GuiterTunesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -496,7 +496,7 @@ using Windows.UI.Xaml.Shapes;
                         break;
                     default:
                         throw new InvalidOperationException(this.selectedString.ToString());
-        }
+                }
             }
         }
 
@@ -519,7 +519,7 @@ using Windows.UI.Xaml.Shapes;
         }
 
         private void SetRecordingMode(Button button, RecordingMode mode, AudioInCallback audioInCallback)
-            {
+        {
             if (!this.youPressedProcess)
             {
                 button.Background = new SolidColorBrush(Colors.Green);
@@ -552,7 +552,7 @@ using Windows.UI.Xaml.Shapes;
         }
 
         private void ResetPage()
-            {
+        {
             this.SetPitch(0);
             this.ResetColor();
         }
@@ -560,12 +560,12 @@ using Windows.UI.Xaml.Shapes;
         private void Button_Click_String1(object sender, RoutedEventArgs e)
         {
             this.SelectString(btnString1, 1, 294.0f, new KeyValuePair<string, float>("E", 329.6f));
-                }
+        }
 
         private void Button_Click_String2(object sender, RoutedEventArgs e)
         {
             this.SelectString(btnString2, 2, 220.0f, new KeyValuePair<string, float>("B", 246.9f));
-                }
+        }
 
         private void Button_Click_String3(object sender, RoutedEventArgs e)
         {
@@ -573,14 +573,14 @@ using Windows.UI.Xaml.Shapes;
         }
 
         private void Button_Click_String4(object sender, RoutedEventArgs e)
-                {
+        {
             this.SelectString(btnString4, 4, 146.8f);
-                }
+        }
 
         private void Button_Click_String5(object sender, RoutedEventArgs e)
-            {
+        {
             this.SelectString(btnString5, 5, 110.0f);
-            }
+        }
 
         private void Button_Click_String6(object sender, RoutedEventArgs e)
         {
@@ -599,12 +599,12 @@ using Windows.UI.Xaml.Shapes;
                 foreach (var item in frequencies)
                 {
                     if (button.Content.Equals(item.Key))
-            {
+                    {
                         this.SetTarget(item.Value);
                         set = true;
                         break;
-            }
-        }
+                    }
+                }
 
                 if (!set)
                 {
