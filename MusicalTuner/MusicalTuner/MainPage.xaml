@@ -18,7 +18,7 @@
         <ComboBox Name = "GuiterTunesCombo"   HorizontalAlignment="Center" Margin="47,22,48,0" VerticalAlignment="Top" Width="289" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="159" Foreground="White" BorderBrush="White" Background="#FF0F0000">
             <ComboBoxItem Content="Standard Tune" Name="Standard" HorizontalAlignment="Center"/>
             <ComboBoxItem Content="Drop E Tune" Name="EDrop" HorizontalAlignment="Center"/>
-            <ComboBoxItem Content="DADGAD Tune" Name="DadGad" HorizontalAlignment="Center"/> 
+            <ComboBoxItem Content="DADGAD Tune" Name="DadGad" HorizontalAlignment="Center"/>
 
         </ComboBox>
         <TextBlock Name="pitchOut" Text="0.00" HorizontalAlignment="Left" Margin="185,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="56" FontSize="20"/>

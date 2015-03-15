@@ -24,6 +24,13 @@
             Nccf,
         }
 
+        enum InterpolationMode
+        {
+            Linear,
+            Parabolic,
+            Gaussian,
+            None,
+        }
         private SoundIO sio;
 
         private FFTWrapper fft;
@@ -45,7 +52,7 @@
         private bool youPressedString = false;
         private bool youPressedProcess = false;
 
-       // Stirng Paramters
+        // Stirng Paramters
         private int selectedString;
         private Button selectedStringButton;
 
@@ -60,7 +67,7 @@
         private bool firstPointIs = false;
         private bool lastPointIs = false;
         private int ignoreSample = 0;
-     
+
         private int meanCounter = 0;
         private float meanFrequency = 0;
         private float meanCalc = 0;
@@ -160,7 +167,7 @@
             bufferPosition = (bufferPosition + data.Length) % this.buffer.Length;
             if (this.bufferPosition == 0)
             {
-                process_audio_Auto(this.buffer, 50, 2000, 3, 1,RecordingMode.Ac);
+                process_audio_Auto(this.buffer, 50, 2000, 3, 1, RecordingMode.Ac);
             }
         }
 
@@ -191,35 +198,31 @@
 
                 // find the best indices
                 int nCandidates = 3;
-                var candidates = findBestCandidates(nCandidates, ref windowedFFT); 
+                var candidates = findBestCandidates(nCandidates, ref windowedFFT);
                 int[] bestIndices = candidates.Item1;
 
                 //Interpolate
                 float[] bestValues = candidates.Item2;
-                float adjustedIndex = interpolate(bestIndices, bestValues);
+                float adjustedIndex = interpolate(bestIndices, bestValues,InterpolationMode.Linear);
 
-           
+
                 // convert back to Hz
                 float[] res = new float[nCandidates];
                 for (int i = 0; i < nCandidates; i++)
                 {
-                    res[i] = (bestIndices[i] ) * (sampleRate / N);
+                    res[i] = (bestIndices[i]) * (sampleRate / N);
                 }
-               int distance = bestIndices[0]-bestIndices[1];
+                int distance = bestIndices[0] - bestIndices[1];
                 //Normalizing the output Frequency
-               float normIndex = this.targetFrequency % 10;
+                float normIndex = this.targetFrequency % 10;
 
-                if (normIndex > 5 && distance==1 )
+                if (normIndex == 0)
                 {
-                    detectedPitch = res[1]+ ((adjustedIndex*10) * sampleRate / N);
-                }
-                else if (normIndex==0)
-                {
-                    detectedPitch = res[1];
+                    detectedPitch = res[0];
                 }
                 else
                 {
-                    detectedPitch = res[0] + (adjustedIndex * sampleRate / N); 
+                    detectedPitch = res[0] + (adjustedIndex * sampleRate / N);
                 }
 
                 recordingFFT = false;
@@ -293,7 +296,7 @@
                     //j = j - 2;
                     if (sampleCounterBtwZeroCrossings > 0)
                     {
-                     
+
                         zeroCrossFrequencyZero = (sampleRate / (2.0f * sampleCounterBtwZeroCrossings));
                         meanCounter++;
                         meanCalc += zeroCrossFrequencyZero;
@@ -305,7 +308,7 @@
                         }
 
                     }
-                  
+
 
                 }
 
@@ -325,7 +328,7 @@
 
         }
 
-        private void process_audio_Auto(float[] input, float minHz, float maxHz, int nCandidates, int nResolution,RecordingMode algorithm)
+        private void process_audio_Auto(float[] input, float minHz, float maxHz, int nCandidates, int nResolution, RecordingMode algorithm)
         {
             float sampleRate = sio.getInputSampleRate();
             int nLowPeriodInSamples = hzToPeriodInSamples(maxHz, sampleRate);
@@ -355,7 +358,7 @@
                     float mean = sum / samples.Length;
                     results[period - nLowPeriodInSamples] = mean;
                 }
-                else if (algorithm==RecordingMode.Nccf)
+                else if (algorithm == RecordingMode.Nccf)
                 {
                     for (int i = 0; i < samples.Length - period; i++)
                     {
@@ -374,7 +377,7 @@
 
             //Interpolate
             float[] bestValues = candidates.Item2;
-            float adjustedIndex = interpolate(bestIndices, bestValues);
+            float adjustedIndex = interpolate(bestIndices, bestValues,InterpolationMode.Parabolic);
             // convert back to Hz
             float[] res = new float[nCandidates];
             for (int i = 0; i < nCandidates; i++)
@@ -386,7 +389,7 @@
 
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                if (detectedPitch >  lowFreq && detectedPitch < highFreq)
+                if (detectedPitch > lowFreq && detectedPitch < highFreq)
                 {
                     this.SetPitch(detectedPitch);
                     double pitchGage = (detectedPitch - this.targetFrequency);
@@ -396,17 +399,27 @@
 
         }
         //Interpolation Function
-        private float interpolate(int[] bestIndices, float[] bestValues)
+        private float interpolate(int[] bestIndices, float[] bestValues, InterpolationMode interpolation)
         {
             int[] x = bestIndices;
             float[] y = bestValues;
-            //float deltam = (y[0] - y[1]) / (2 * y[0] - y[1] - y[2]) / 2;
-            float deltam = (y[1] - y[2]) / (2 * y[0] - y[1] - y[2]) / 2;
-            ////double deltaG = Math.Log(y[1] / y[2]) / Math.Log(Math.Pow(y[0], 2.0) / y[1] / y[2]) / 2;
+            float deltam = 0;
+            if (interpolation==InterpolationMode.Linear)
+            {
+                deltam = (y[1] - y[2]) / (2 * y[1] - y[0] - y[2]) / 2;
+            }
+            else if (interpolation==InterpolationMode.Parabolic)
+            {
+                deltam = (y[0] - y[1]) / (2 * y[0] - y[1] - y[2]) / 2;
+            }
+            else if (interpolation==InterpolationMode.Gaussian)
+            {
+                deltam = (float)(Math.Log(y[1] / y[2]) / Math.Log(Math.Pow(y[0], 2.0) / y[1] / y[2]) / 2);
+            }
 
             return deltam;
         }
-        
+
         //Find Best Indexes based on the values of the input array and returns top n ranked indexes.
         private static Tuple<int[], float[]> findBestCandidates(int n, ref float[] inputs)
         {
