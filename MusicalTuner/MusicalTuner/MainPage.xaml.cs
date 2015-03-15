@@ -167,7 +167,7 @@
             bufferPosition = (bufferPosition + data.Length) % this.buffer.Length;
             if (this.bufferPosition == 0)
             {
-                process_audio_Auto(this.buffer, 50, 2000, 3, 1, RecordingMode.Ac);
+                process_audio_Auto(this.buffer, 50, 600, 3, 1, RecordingMode.Ac);
             }
         }
 
