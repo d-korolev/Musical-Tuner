@@ -69,6 +69,7 @@
         private readonly LinearGradientBrush gradientBlack = new LinearGradientBrush();
         private readonly LinearGradientBrush gradientRed = new LinearGradientBrush();
         private readonly LinearGradientBrush gradientGreen = new LinearGradientBrush();
+        private float detectedPitch;
 
         public MainPage()
         {
@@ -175,16 +176,58 @@
                 fft = new FFTWrapper(N);
 
                 float[] fftmag = fft.fftMag(this.buffer);
-                // Detect and display dominant freq.
-                float maxValue = fftmag.Max();
-                float maxIndex = fftmag.ToList().IndexOf(maxValue);
-                float detectedPitch = maxIndex * (sampleRate / N);
+                // Set Search Window
+                uint W = (uint)(targetFrequency / sampleRate * N + 2);
+                float[] windowedFFT = new float[W];
+                int windowSize = windowedFFT.Length;
+                for (int i = 0; i < windowSize; i++)
+                {
+                    windowedFFT[i] = fftmag[i];
+                }
+
+                // find the best indices
+                int nCandidates = 3;
+                var candidates = findBestCandidates(nCandidates, ref windowedFFT); //note findBestCandidates modifies parameter
+                int[] bestIndices = candidates.Item1;
+
+                //Interpolate
+                float[] bestValues = candidates.Item2;
+                float adjustedIndex = interpolate(bestIndices, bestValues);
+                // convert back to Hz
+                float[] res = new float[nCandidates];
+                for (int i = 0; i < nCandidates; i++)
+                {
+                    res[i] = (bestIndices[i] + (adjustedIndex * (sampleRate / N))) * (sampleRate / N);
+                }
+               
+                //Normalizing the output Frequency
+                float normIndex = this.targetFrequency % (sampleRate / N);
+
+                if (normIndex > 5 || normIndex == 0)
+                {
+                    detectedPitch = res[0];
+                }
+                else
+                {
+                    detectedPitch = res[1];
+                }
+
+                //int indexDelta = bestIndices[0]-bestIndices[1];
+                //if (indexDelta==1 )
+                //{
+                //    detectedPitch = res[1];
+                //}
+                //else
+                //{
+                //    detectedPitch = res[0];
+                //}
+                //detectedPitch = res[0];
                 recordingFFT = false;
                 Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
                     if (detectedPitch > lowFreq && detectedPitch < highFreq)
                     {
-                        this.SetPitch(0);
+                        this.SetPitch(detectedPitch);
                         double pitchGage = (detectedPitch - this.targetFrequency);
                         changeColor(pitchGage);
                     }
@@ -297,17 +340,17 @@
             }
 
             // yield an array of data, and then we find the index at which the value is highest.
-            double[] results = new double[nHiPeriodInSamples - nLowPeriodInSamples];
+            float[] results = new float[nHiPeriodInSamples - nLowPeriodInSamples];
             for (int period = nLowPeriodInSamples; period < nHiPeriodInSamples; period += nResolution)
             {
-                double sum = 0;
+                float sum = 0;
                 // for each sample, find correlation. (If they are far apart, small)
                 for (int i = 0; i < samples.Length - period; i++)
                 {
                     sum += samples[i] * samples[i + period];
                 }
 
-                double mean = sum / (double)samples.Length;
+                float mean = sum / samples.Length;
                 results[period - nLowPeriodInSamples] = mean;
             }
 
@@ -316,16 +359,16 @@
             int[] bestIndices = candidates.Item1;
 
             //Interpolate
-            double[] bestValues = candidates.Item2;
-            double adjustedIndex = interpolate(bestIndices, bestValues);
+            float[] bestValues = candidates.Item2;
+            float adjustedIndex = interpolate(bestIndices, bestValues);
             // convert back to Hz
-            double[] res = new double[nCandidates];
+            float[] res = new float[nCandidates];
             for (int i = 0; i < nCandidates; i++)
             {
                 res[i] = periodInSamplesToHz((bestIndices[i] + nLowPeriodInSamples) + adjustedIndex, sampleRate);
             }
 
-            double detectedPitch = res[0];
+            float detectedPitch = res[0];
 
             Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
@@ -338,27 +381,28 @@
             });
 
         }
-
-        private double interpolate(int[] bestIndices, double[] bestValues)
+        //Interpolation Function
+        private float interpolate(int[] bestIndices, float[] bestValues)
         {
             int[] x = bestIndices;
-            double[] y = bestValues;
-            double deltam = (y[1] - y[2]) / (2 * y[0] - y[1] - y[2]) / 2;
+            float[] y = bestValues;
+            float deltam = (y[1] - y[2]) / (2 * y[0] - y[1] - y[2]) / 2;
             double deltaG = Math.Log(y[1] / y[2]) / Math.Log(Math.Pow(y[0], 2.0) / y[1] / y[2]) / 2;
 
             return deltam;
         }
-
-        private static Tuple<int[], double[]> findBestCandidates(int n, ref double[] inputs)
+        
+        //Find Best Indexes based on the values of the input array and returns top n ranked indexes.
+        private static Tuple<int[], float[]> findBestCandidates(int n, ref float[] inputs)
         {
             if (inputs.Length < n) throw new Exception("Length of inputs is not long enough.");
             int[] res = new int[n]; // will hold indices with the highest amounts.
-            double[] values = new double[n];
+            float[] values = new float[n];
 
             for (int c = 0; c < n; c++)
             {
                 // find the highest.
-                double fBestValue = double.MinValue;
+                float fBestValue = float.MinValue;
                 int nBestIndex = -1;
                 for (int i = 0; i < inputs.Length; i++)
                 {
@@ -373,11 +417,11 @@
                 values[c] = inputs[nBestIndex];
 
                 // now blank out that index.
-                inputs[nBestIndex] = double.MinValue;
+                inputs[nBestIndex] = float.MinValue;
 
             }
 
-            return new Tuple<int[], double[]>(res, values);
+            return new Tuple<int[], float[]>(res, values);
         }
 
         private static int hzToPeriodInSamples(double hz, float sampleRate)
@@ -385,9 +429,9 @@
             return (int)(1 / (hz / (double)sampleRate));
         }
 
-        private static double periodInSamplesToHz(double period, float sampleRate)
+        private static float periodInSamplesToHz(float period, float sampleRate)
         {
-            return 1 / (period / (double)sampleRate);
+            return 1 / (period / sampleRate);
         }
 
         public void changeColor(double pitchDelta)

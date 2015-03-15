@@ -93,6 +93,14 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\guitar_106.png" />
+    <Content Include="Assets\guitar_120.png" />
+    <Content Include="Assets\guitar_128.png" />
+    <Content Include="Assets\guitar_170.png" />
+    <Content Include="Assets\guitar_360.png" />
+    <Content Include="Assets\guitar_71.scale-240.png" />
+    <Content Include="Assets\guitar_744.png" />
+    <Content Include="Assets\Guitar_Pro.png" />
     <Content Include="Assets\Logo.scale-240.png" />
     <Content Include="Assets\SmallLogo.scale-240.png" />
     <Content Include="Assets\SplashScreen.scale-240.png" />
@@ -124,6 +132,7 @@
       <Name>libsound</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
