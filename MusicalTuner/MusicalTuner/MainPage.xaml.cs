@@ -21,6 +21,7 @@
             Fft,
             Zc,
             Ac,
+            Nccf,
         }
 
         private SoundIO sio;
@@ -44,7 +45,10 @@
         private bool youPressedString = false;
         private bool youPressedProcess = false;
 
+       // Stirng Paramters
         private int selectedString;
+        private Button selectedStringButton;
+
 
         // Zero Crossing related variables
 
@@ -156,7 +160,7 @@
             bufferPosition = (bufferPosition + data.Length) % this.buffer.Length;
             if (this.bufferPosition == 0)
             {
-                process_audio_Auto(this.buffer, 50, 600, 3, 1);
+                process_audio_Auto(this.buffer, 50, 2000, 3, 1,RecordingMode.Ac);
             }
         }
 
@@ -176,7 +180,7 @@
                 fft = new FFTWrapper(N);
 
                 float[] fftmag = fft.fftMag(this.buffer);
-                // Set Search Window
+                // Set FFT Search Window
                 uint W = (uint)(targetFrequency / sampleRate * N + 2);
                 float[] windowedFFT = new float[W];
                 int windowSize = windowedFFT.Length;
@@ -187,41 +191,37 @@
 
                 // find the best indices
                 int nCandidates = 3;
-                var candidates = findBestCandidates(nCandidates, ref windowedFFT); //note findBestCandidates modifies parameter
+                var candidates = findBestCandidates(nCandidates, ref windowedFFT); 
                 int[] bestIndices = candidates.Item1;
 
                 //Interpolate
                 float[] bestValues = candidates.Item2;
                 float adjustedIndex = interpolate(bestIndices, bestValues);
+
+           
                 // convert back to Hz
                 float[] res = new float[nCandidates];
                 for (int i = 0; i < nCandidates; i++)
                 {
-                    res[i] = (bestIndices[i] + (adjustedIndex * (sampleRate / N))) * (sampleRate / N);
+                    res[i] = (bestIndices[i] ) * (sampleRate / N);
                 }
-               
+               int distance = bestIndices[0]-bestIndices[1];
                 //Normalizing the output Frequency
-                float normIndex = this.targetFrequency % (sampleRate / N);
+               float normIndex = this.targetFrequency % 10;
 
-                if (normIndex > 5 || normIndex == 0)
+                if (normIndex > 5 && distance==1 )
                 {
-                    detectedPitch = res[0];
+                    detectedPitch = res[1]+ ((adjustedIndex*10) * sampleRate / N);
                 }
-                else
+                else if (normIndex==0)
                 {
                     detectedPitch = res[1];
                 }
+                else
+                {
+                    detectedPitch = res[0] + (adjustedIndex * sampleRate / N); 
+                }
 
-                //int indexDelta = bestIndices[0]-bestIndices[1];
-                //if (indexDelta==1 )
-                //{
-                //    detectedPitch = res[1];
-                //}
-                //else
-                //{
-                //    detectedPitch = res[0];
-                //}
-                //detectedPitch = res[0];
                 recordingFFT = false;
                 Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
@@ -325,10 +325,9 @@
 
         }
 
-        private void process_audio_Auto(float[] input, double minHz, double maxHz, int nCandidates, int nResolution)
+        private void process_audio_Auto(float[] input, float minHz, float maxHz, int nCandidates, int nResolution,RecordingMode algorithm)
         {
             float sampleRate = sio.getInputSampleRate();
-            float numOfChannel = sio.getInputNumChannels();
             int nLowPeriodInSamples = hzToPeriodInSamples(maxHz, sampleRate);
             int nHiPeriodInSamples = hzToPeriodInSamples(minHz, sampleRate);
             if (nHiPeriodInSamples <= nLowPeriodInSamples) throw new Exception("Bad range for pitch detection.");
@@ -344,18 +343,33 @@
             for (int period = nLowPeriodInSamples; period < nHiPeriodInSamples; period += nResolution)
             {
                 float sum = 0;
+                float sumSamples = 0;
+                float sumLaggedSamples = 0;
                 // for each sample, find correlation. (If they are far apart, small)
-                for (int i = 0; i < samples.Length - period; i++)
+                if (algorithm == RecordingMode.Ac)
                 {
-                    sum += samples[i] * samples[i + period];
+                    for (int i = 0; i < samples.Length - period; i++)
+                    {
+                        sum += samples[i] * samples[i + period];
+                    }
+                    float mean = sum / samples.Length;
+                    results[period - nLowPeriodInSamples] = mean;
                 }
-
-                float mean = sum / samples.Length;
-                results[period - nLowPeriodInSamples] = mean;
+                else if (algorithm==RecordingMode.Nccf)
+                {
+                    for (int i = 0; i < samples.Length - period; i++)
+                    {
+                        sumSamples += samples[i] * samples[i];
+                        sumLaggedSamples += samples[i + period] * samples[i + period];
+                    }
+                    double NCCF = sum / Math.Sqrt(sumSamples + sumLaggedSamples);
+                    results[period - nLowPeriodInSamples] = (float)NCCF;
+                }
             }
 
             // find the best indices
             var candidates = findBestCandidates(nCandidates, ref results); //note findBestCandidates modifies parameter
+
             int[] bestIndices = candidates.Item1;
 
             //Interpolate
@@ -386,8 +400,9 @@
         {
             int[] x = bestIndices;
             float[] y = bestValues;
+            //float deltam = (y[0] - y[1]) / (2 * y[0] - y[1] - y[2]) / 2;
             float deltam = (y[1] - y[2]) / (2 * y[0] - y[1] - y[2]) / 2;
-            double deltaG = Math.Log(y[1] / y[2]) / Math.Log(Math.Pow(y[0], 2.0) / y[1] / y[2]) / 2;
+            ////double deltaG = Math.Log(y[1] / y[2]) / Math.Log(Math.Pow(y[0], 2.0) / y[1] / y[2]) / 2;
 
             return deltam;
         }
@@ -658,33 +673,33 @@
 
         private void SelectString(Button button, int selection, float defaultFrequency, params KeyValuePair<string, float>[] frequencies)
         {
-            if (!youPressedString)
+            if (this.selectedStringButton != null)
             {
-                button.Background = new SolidColorBrush(Colors.Green);
-                youPressedString = true;
-                selectedString = selection;
+                this.selectedStringButton.Background = new SolidColorBrush(Colors.Red);
+            }
 
-                bool set = false;
-                foreach (var item in frequencies)
-                {
-                    if (button.Content.Equals(item.Key))
-                    {
-                        this.SetTarget(item.Value);
-                        set = true;
-                        break;
-                    }
-                }
+            this.selectedStringButton = button;
+            button.Background = new SolidColorBrush(Colors.Green);
+            youPressedString = true;
+            selectedString = selection;
+            ResetPage();
 
-                if (!set)
+            bool set = false;
+            foreach (var item in frequencies)
+            {
+                if (button.Content.Equals(item.Key))
                 {
-                    this.SetTarget(defaultFrequency);
+                    this.SetTarget(item.Value);
+                    set = true;
+                    break;
                 }
             }
-            else if (selectedString == selection)
+
+            if (!set)
             {
-                button.Background = new SolidColorBrush(Colors.Red);
-                youPressedString = false;
+                this.SetTarget(defaultFrequency);
             }
         }
+
     }
 }

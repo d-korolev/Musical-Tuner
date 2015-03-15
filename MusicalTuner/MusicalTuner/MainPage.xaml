@@ -18,19 +18,19 @@
         <ComboBox Name = "GuiterTunesCombo"   HorizontalAlignment="Center" Margin="47,22,48,0" VerticalAlignment="Top" Width="289" SelectionChanged="GuiterTunesCombo_SelectionChanged" Height="159" Foreground="White" BorderBrush="White" Background="#FF0F0000">
             <ComboBoxItem Content="Standard Tune" Name="Standard" HorizontalAlignment="Center"/>
             <ComboBoxItem Content="Drop E Tune" Name="EDrop" HorizontalAlignment="Center"/>
-            <ComboBoxItem Content="DADGAD Tune" Name="DadGad" HorizontalAlignment="Center"/>
+            <ComboBoxItem Content="DADGAD Tune" Name="DadGad" HorizontalAlignment="Center"/> 
 
         </ComboBox>
-        <TextBlock Name="pitchOut" Text="000.0" HorizontalAlignment="Left" Margin="185,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="56" FontSize="20"/>
+        <TextBlock Name="pitchOut" Text="0.00" HorizontalAlignment="Left" Margin="185,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="56" FontSize="20"/>
         <Button x:Name="btnFFT" Content="FFT" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,556,0,0" FontSize="14" Click="Button_Click_FFT" Background="red"/>
         <Button x:Name="btnAuto" Content="Autocorrelation" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="248,556,0,0" FontSize="14" Click="Button_Click_Autocorrelation" Background="red"/>
         <Button x:Name="btnZero" Content="Zero Crossing" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,556,0,0" FontSize="14" Click="Button_Click_ZeroCrossing" Background="red"/>
-        <TextBlock HorizontalAlignment="Left" Margin="45,105,0,0" TextWrapping="Wrap" Text="String 1" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="173,105,0,0" TextWrapping="Wrap" Text="String 2" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="303,105,0,0" TextWrapping="Wrap" Text="String 3" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="45,167,0,0" TextWrapping="Wrap" Text="String 4" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="173,167,0,0" TextWrapping="Wrap" Text="String 5" VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" Margin="303,167,0,0" TextWrapping="Wrap" Text="String 6" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="45,105,0,0" TextWrapping="Wrap" Text="String 1" VerticalAlignment="Top" Opacity="0.8"/>
+        <TextBlock HorizontalAlignment="Left" Margin="173,105,0,0" TextWrapping="Wrap" Text="String 2" VerticalAlignment="Top" IsHitTestVisible="False" Opacity="0.8"/>
+        <TextBlock HorizontalAlignment="Left" Margin="303,105,0,0" TextWrapping="Wrap" Text="String 3" VerticalAlignment="Top" Opacity="0.8"/>
+        <TextBlock HorizontalAlignment="Left" Margin="45,167,0,0" TextWrapping="Wrap" Text="String 4" VerticalAlignment="Top" Opacity="0.8"/>
+        <TextBlock HorizontalAlignment="Left" Margin="173,167,0,0" TextWrapping="Wrap" Text="String 5" VerticalAlignment="Top" Opacity="0.8"/>
+        <TextBlock HorizontalAlignment="Left" Margin="303,167,0,0" TextWrapping="Wrap" Text="String 6" VerticalAlignment="Top" Opacity="0.8"/>
 
         <Rectangle Name="centerFrequency" HorizontalAlignment="Left" Height="177" Margin="173,314,0,0" Stroke="Black" VerticalAlignment="Top" Width="37" RenderTransformOrigin="2.567,-0.122">
             <Rectangle.Fill>
@@ -90,7 +90,7 @@
                 </LinearGradientBrush>
             </Rectangle.Fill>
         </Rectangle>
-        <TextBlock x:Name="pitchOutTarget" Text="000.0" HorizontalAlignment="Left" Margin="185,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="52" FontSize="20"/>
+        <TextBlock x:Name="pitchOutTarget" Text="0.00" HorizontalAlignment="Left" Margin="185,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="28" Width="52" FontSize="20"/>
         <TextBlock HorizontalAlignment="Left" Margin="125,237,0,0" TextWrapping="Wrap" Text="Pitch:" VerticalAlignment="Top" Height="20" Width="46" FontSize="18"/>
         <TextBlock HorizontalAlignment="Left" Margin="115,269,0,0" TextWrapping="Wrap" Text="Target:" VerticalAlignment="Top" Height="20" Width="56" FontSize="18"/>
         <TextBlock HorizontalAlignment="Left" Margin="246,237,0,0" TextWrapping="Wrap" Text="Hz" VerticalAlignment="Top" Height="20" Width="21" FontSize="18"/>
