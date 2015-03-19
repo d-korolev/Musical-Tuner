@@ -26,7 +26,7 @@
 
         enum InterpolationMode
         {
-            Linear,
+            ModifiedParabolic,
             Parabolic,
             Gaussian,
             None,
@@ -203,7 +203,7 @@
 
                 //Interpolate
                 float[] bestValues = candidates.Item2;
-                float adjustedIndex = interpolate(bestIndices, bestValues,InterpolationMode.Linear);
+                float adjustedIndex = interpolate(bestIndices, bestValues,InterpolationMode.ModifiedParabolic);
 
 
                 // convert back to Hz
@@ -404,7 +404,7 @@
             int[] x = bestIndices;
             float[] y = bestValues;
             float deltam = 0;
-            if (interpolation==InterpolationMode.Linear)
+            if (interpolation == InterpolationMode.ModifiedParabolic)
             {
                 deltam = (y[1] - y[2]) / (2 * y[1] - y[0] - y[2]) / 2;
             }
