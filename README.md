@@ -1,3 +1,5 @@
 # Musical-Tuner
-Added lisound file. Added low pass filter filters library
+Guitar tuner windows phone application.
+Signal processing and fundamental frequency detection is done using 3 methods: FFT, Autocorrelation and Zero Crossing.
+
 
